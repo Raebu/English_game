@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6c5ce7" />
+  <meta name="description" content="A fun, level-based English game for learning common, proper and abstract nouns." />
+  <title>Noun Quest — The Ultimate Noun Detective Game</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <button id="soundButton" class="icon-button" type="button" aria-label="Toggle sound" title="Toggle sound">🔊</button>
+      <div class="brand" aria-label="Noun Quest">
+        <span class="brand-mark">🔎</span>
+        <div>
+          <strong>Noun Quest</strong>
+          <small>Detective Academy</small>
+        </div>
+      </div>
+      <button id="helpButton" class="icon-button" type="button" aria-label="Show noun guide" title="Noun guide">?</button>
+    </header>
+
+    <section id="homeScreen" class="screen active home-screen" aria-labelledby="homeTitle">
+      <div class="hero-card">
+        <div class="detective-badge" aria-hidden="true">
+          <span class="badge-glow"></span>
+          <span class="badge-emoji">🕵️</span>
+        </div>
+        <p class="eyebrow">THE ULTIMATE NOUN DETECTIVE CHALLENGE</p>
+        <h1 id="homeTitle">Become a <span>Noun Master!</span></h1>
+        <p class="hero-copy">Spot common, proper and abstract nouns, build streaks, unlock harder levels and climb the Detective Academy ranks.</p>
+
+        <div class="noun-pills" aria-label="Noun types">
+          <span class="pill common">🎒 Common</span>
+          <span class="pill proper">👑 Proper</span>
+          <span class="pill abstract">💭 Abstract</span>
+        </div>
+
+        <label class="name-label" for="playerName">Detective name</label>
+        <input id="playerName" class="name-input" maxlength="18" autocomplete="off" placeholder="Type your name" aria-label="Detective name" />
+
+        <button id="startButton" class="primary-button" type="button">
+          <span>Start Mission</span><span aria-hidden="true">🚀</span>
+        </button>
+        <button id="continueButton" class="secondary-button hidden" type="button">Continue Mission</button>
+      </div>
+
+      <div class="mini-cards" aria-label="Game features">
+        <article><span>⚡</span><strong>Level Up</strong><small>Questions get tougher</small></article>
+        <article><span>🔥</span><strong>Build Streaks</strong><small>Bonus points for runs</small></article>
+        <article><span>🏆</span><strong>Earn Ranks</strong><small>Rise through the academy</small></article>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen game-screen" aria-live="polite">
+      <div class="status-panel">
+        <div class="level-area">
+          <span class="level-label">LEVEL <strong id="levelNumber">1</strong></span>
+          <span id="rankName" class="rank-name">Rookie Detective</span>
+        </div>
+        <div class="status-stats">
+          <span title="Score">⭐ <strong id="scoreValue">0</strong></span>
+          <span title="Streak">🔥 <strong id="streakValue">0</strong></span>
+          <span title="Lives">❤️ <strong id="livesValue">3</strong></span>
+        </div>
+      </div>
+
+      <div class="progress-track" aria-label="Level progress">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div class="progress-caption"><span id="progressText">Question 1 of 6</span><span id="xpText">0 / 6 correct</span></div>
+
+      <section class="question-card" aria-labelledby="questionPrompt">
+        <div class="mission-row">
+          <span id="missionIcon" class="mission-icon">🔍</span>
+          <div>
+            <span class="mission-label">YOUR MISSION</span>
+            <p id="instructionText">What type of noun is this?</p>
+          </div>
+        </div>
+
+        <div id="questionPrompt" class="question-prompt">teacher</div>
+        <div id="questionContext" class="question-context hidden"></div>
+
+        <div id="answers" class="answers" role="group" aria-label="Answer choices"></div>
+
+        <div id="feedback" class="feedback hidden" role="status">
+          <div id="feedbackIcon" class="feedback-icon">✨</div>
+          <div>
+            <strong id="feedbackTitle">Correct!</strong>
+            <p id="feedbackMessage"></p>
+          </div>
+        </div>
+
+        <button id="nextButton" class="primary-button next-button hidden" type="button">Next Question →</button>
+      </section>
+    </section>
+
+    <section id="levelScreen" class="screen celebration-screen" aria-labelledby="levelTitle">
+      <div class="confetti" aria-hidden="true"></div>
+      <div class="celebration-card">
+        <div id="levelEmoji" class="big-emoji">🎉</div>
+        <p class="eyebrow">MISSION COMPLETE</p>
+        <h2 id="levelTitle">Level cleared!</h2>
+        <p id="levelSummary">Fantastic detective work.</p>
+        <div class="results-grid">
+          <div><strong id="levelCorrect">0</strong><span>Correct</span></div>
+          <div><strong id="levelAccuracy">0%</strong><span>Accuracy</span></div>
+          <div><strong id="levelScore">0</strong><span>Total Score</span></div>
+        </div>
+        <div id="unlockCard" class="unlock-card">
+          <span>🔓</span>
+          <div><small>NEW RANK</small><strong id="newRank">Word Scout</strong></div>
+        </div>
+        <button id="nextLevelButton" class="primary-button" type="button">Level Up! 🚀</button>
+      </div>
+    </section>
+
+    <section id="gameOverScreen" class="screen celebration-screen" aria-labelledby="gameOverTitle">
+      <div class="celebration-card">
+        <div class="big-emoji">🧠</div>
+        <p class="eyebrow">TRAINING CHECKPOINT</p>
+        <h2 id="gameOverTitle">Great detective practice!</h2>
+        <p>You ran out of hearts, but every mistake makes your noun powers stronger.</p>
+        <div class="results-grid two">
+          <div><strong id="finalScore">0</strong><span>Score</span></div>
+          <div><strong id="bestLevel">1</strong><span>Best Level</span></div>
+        </div>
+        <button id="retryButton" class="primary-button" type="button">Try Again 🔄</button>
+        <button id="homeButton" class="secondary-button" type="button">Back to Academy</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="guideDialog" class="guide-dialog">
+    <button id="closeGuideButton" class="dialog-close" aria-label="Close guide">×</button>
+    <p class="eyebrow">DETECTIVE HANDBOOK</p>
+    <h2>Noun Power Guide</h2>
+    <div class="guide-list">
+      <article class="guide-common"><span>🎒</span><div><strong>Common Nouns</strong><p>General names for people, places or things, such as <b>dog</b>, <b>school</b> or <b>bicycle</b>.</p></div></article>
+      <article class="guide-proper"><span>👑</span><div><strong>Proper Nouns</strong><p>Special names for particular people, places, days or brands. They begin with a capital letter, like <b>London</b>, <b>Friday</b> or <b>Disney</b>.</p></div></article>
+      <article class="guide-abstract"><span>💭</span><div><strong>Abstract Nouns</strong><p>Feelings, ideas and qualities you cannot touch, such as <b>joy</b>, <b>kindness</b> or <b>bravery</b>.</p></div></article>
+    </div>
+  </dialog>
+
+  <script src="game.js"></script>
+</body>
+</html>
