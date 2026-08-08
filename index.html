@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#08102d" />
-  <meta name="description" content="Adaptive Year 4 KS2 learning adventure with a true 3D world, KS2 Coin rewards, persistent building, parent progress and AI tutoring." />
+  <meta name="theme-color" content="#5fbdf7" />
+  <meta name="description" content="Adaptive Year 4 KS2 learning adventure with a rich 3D academy world, KS2 Coin rewards, parent progress and AI tutoring." />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/academy.css" />
   <link rel="stylesheet" href="/game-world.css" />
@@ -20,23 +20,22 @@
 
     <section class="view world-view" data-view="world">
       <section class="world-shell" aria-label="Genius Academy 3D learning world">
-        <div class="world-hud minimal-hud">
-          <div class="world-status"><span>LV <strong id="worldLevel">1</strong></span><span class="world-coin">🪙 <strong id="worldCoins">0</strong></span></div>
-          <div class="world-mini-actions"><button id="openBase" class="world-icon-button" aria-label="Open base builder">🏠</button><button class="world-icon-button" data-nav="home" aria-label="Open quests">🎯</button></div>
-        </div>
-        <canvas id="worldCanvas" aria-label="Walk around the 3D Genius Academy and enter subject buildings"></canvas>
-        <div id="worldTip" class="world-tip" hidden>Walk closer to a building</div>
-        <div class="world-controls" aria-label="Movement controls">
-          <div class="joystick-pad" aria-label="Move character">
-            <button class="up" data-move="ArrowUp" aria-label="Move forward">▲</button>
-            <button class="left" data-move="ArrowLeft" aria-label="Move left">◀</button>
-            <button class="down" data-move="ArrowDown" aria-label="Move backward">▼</button>
-            <button class="right" data-move="ArrowRight" aria-label="Move right">▶</button>
+        <div class="world-hud premium-hud">
+          <div class="world-hud-left">
+            <span class="premium-pill level-pill"><span class="pill-icon">⭐</span><span>LV <strong id="worldLevel">1</strong></span></span>
+            <span class="premium-pill coin-pill"><span class="coin-orb">🪙</span><strong id="worldCoins">0</strong></span>
           </div>
-          <button id="worldAction" class="world-action" aria-label="Interact" hidden>ENTER</button>
+          <div class="world-hud-right">
+            <button id="openBase" class="premium-icon-button" aria-label="Open your base">🏠</button>
+            <button class="premium-icon-button" data-nav="home" aria-label="Open quests">📜</button>
+          </div>
         </div>
+        <canvas id="worldCanvas" aria-label="Explore Genius Academy. Drag to walk. Pinch to zoom. Tap a building to approach it."></canvas>
+        <div id="worldNearby" class="nearby-card" hidden><span id="nearbyIcon">📚</span><div><strong id="nearbyName">Story Keep</strong><small id="nearbyAction">Tap to enter</small></div></div>
+        <div id="gestureHint" class="gesture-hint"><div class="gesture-hand">☝️</div><strong>Drag to move</strong><small>Pinch to zoom · tap a building to approach</small></div>
+        <button id="worldAction" class="floating-enter" hidden>Enter</button>
         <section id="basePanel" class="world-panel" hidden>
-          <div class="world-panel-head"><div><span class="eyebrow">YOUR BASE</span><h2>Build your world</h2></div><button id="closeBase" class="world-close">✕</button></div>
+          <div class="world-panel-head"><div><span class="eyebrow">YOUR BASE</span><h2>Build your academy home</h2></div><button id="closeBase" class="world-close">✕</button></div>
           <p>Use KS2 Coins earned from learning and helpful real-life missions. Balance: <strong>🪙 <span id="shopCoins">0</span></strong></p>
           <div id="buildShop" class="build-shop"></div>
         </section>
@@ -50,34 +49,20 @@
         <div class="hud-chip xp"><small>XP</small><strong id="homeWorldXP">0</strong></div>
         <div class="hud-chip streak"><small>🔥 Streak</small><strong id="worldStreak">1</strong></div>
       </section>
-
       <section class="world-stage" aria-label="Learning world mission board">
-        <div class="sky-cloud cloud-a"></div><div class="sky-cloud cloud-b"></div>
         <div class="quest-ribbon">⚡ DAILY QUEST LIVE</div>
-        <div class="world-title"><span class="eyebrow">QUEST BOARD</span><h1>Choose a mission</h1><p>You can also enter missions by walking into their buildings in the 3D World.</p></div>
+        <div class="world-title"><span class="eyebrow">QUEST BOARD</span><h1>Choose a mission</h1><p>Or explore the academy world and walk into a subject building.</p></div>
         <div class="zone-map">
-          <button class="zone" data-subject="maths"><div class="zone-building">➗</div><strong>Number Citadel</strong><small>Maths</small></button>
+          <button class="zone" data-subject="maths"><div class="zone-building">➗</div><strong>Math Manor</strong><small>Maths</small></button>
           <button class="zone" data-subject="english"><div class="zone-building">📚</div><strong>Story Keep</strong><small>English</small></button>
-          <button class="zone" data-subject="science"><div class="zone-building">🔬</div><strong>Discovery Lab</strong><small>Science</small></button>
-          <button class="zone" data-subject="computing"><div class="zone-building">💻</div><strong>Code Core</strong><small>Computing</small></button>
+          <button class="zone" data-subject="science"><div class="zone-building">🔬</div><strong>Science Lab</strong><small>Science</small></button>
+          <button class="zone" data-subject="computing"><div class="zone-building">💻</div><strong>Code Tower</strong><small>Computing</small></button>
           <button class="zone" data-subject="geography"><div class="zone-building">🌍</div><strong>Explorer Lodge</strong><small>Geography</small></button>
-          <button class="zone" data-subject="life"><div class="zone-building">🧠</div><strong>Life HQ</strong><small>Life Skills</small></button>
+          <button class="zone" data-subject="life"><div class="zone-building">🧠</div><strong>Think Tower</strong><small>Life Skills</small></button>
         </div>
       </section>
-
-      <section class="hero">
-        <span class="eyebrow">PERSONALISED QUEST LINE</span>
-        <h1>Ready, <span id="childName">Learner</span>?</h1>
-        <p>Your adaptive quest line targets the skills that will improve you fastest. Complete missions to earn XP and KS2 Coins for your world.</p>
-        <div class="stats"><div class="stat"><strong id="xp">0</strong><small>Total XP</small></div><div class="stat"><strong id="streak">1</strong><small>Day streak</small></div><div class="stat"><strong id="dailyProgress">0/4</strong><small>Daily quests</small></div></div>
-      </section>
-
-      <section class="section daily-card">
-        <div class="daily-head"><strong>🎯 Today’s Quest Chain</strong><span>Adaptive</span></div>
-        <div class="bar"><i id="dailyBar"></i></div>
-        <div id="dailySubjects" class="chips"></div>
-        <button id="dailyStart" class="primary">Launch next mission ⚔️</button>
-      </section>
+      <section class="hero"><span class="eyebrow">PERSONALISED QUEST LINE</span><h1>Ready, <span id="childName">Learner</span>?</h1><p>Your adaptive quest line targets the skills that will improve you fastest. Complete missions to earn XP and KS2 Coins.</p><div class="stats"><div class="stat"><strong id="xp">0</strong><small>Total XP</small></div><div class="stat"><strong id="streak">1</strong><small>Day streak</small></div><div class="stat"><strong id="dailyProgress">0/4</strong><small>Daily quests</small></div></div></section>
+      <section class="section daily-card"><div class="daily-head"><strong>🎯 Today’s Quest Chain</strong><span>Adaptive</span></div><div class="bar"><i id="dailyBar"></i></div><div id="dailySubjects" class="chips"></div><button id="dailyStart" class="primary">Launch next mission ⚔️</button></section>
       <section class="section"><div class="section-title"><h2>🌌 All Missions</h2><small>Choose any subject</small></div><div id="subjects" class="subjects"></div></section>
       <section class="section panel"><div class="section-title"><h2>🎯 Training Targets</h2><small>Weak skills are prioritised</small></div><ul id="weakSkills" class="weak-list"></ul></section>
     </section>
@@ -95,29 +80,25 @@
     </section>
 
     <section class="view" data-view="parent" hidden>
-      <section class="panel">
-        <div class="parent-hero"><div><span class="eyebrow">PARENT HQ</span><h1 id="parentChild">Learner</h1><p>See exactly what is improving, where support is needed and what the adaptive engine will train next.</p></div><button class="ghost" style="color:#fff" data-nav="world">Close</button></div>
-        <div class="parent-stats"><div><strong id="parentAccuracy">0%</strong><small>7-day accuracy</small></div><div><strong id="parentQuestions">0</strong><small>questions / 7 days</small></div><div><strong id="parentXP">0</strong><small>total XP</small></div></div>
-      </section>
-      <section class="parent-coin-panel"><h2>🪙 KS2 Coin Economy</h2><div class="parent-coin-grid"><div><strong id="parentCoins">0</strong><small>current balance</small></div><div><strong id="parentEarned">0</strong><small>earned through learning</small></div><div><strong id="parentSpent">0</strong><small>spent on world building</small></div></div><p class="economy-note">KS2C is a closed-loop in-app reward. It cannot be bought, sold, withdrawn, traded or converted to money. Learning is the main source of rewards.</p></section>
+      <section class="panel"><div class="parent-hero"><div><span class="eyebrow">PARENT HQ</span><h1 id="parentChild">Learner</h1><p>See exactly what is improving, where support is needed and what the adaptive engine will train next.</p></div><button class="ghost" style="color:#fff" data-nav="world">Close</button></div><div class="parent-stats"><div><strong id="parentAccuracy">0%</strong><small>7-day accuracy</small></div><div><strong id="parentQuestions">0</strong><small>questions / 7 days</small></div><div><strong id="parentXP">0</strong><small>total XP</small></div></div></section>
+      <section class="parent-coin-panel"><h2>🪙 KS2 Coin Economy</h2><div class="parent-coin-grid"><div><strong id="parentCoins">0</strong><small>current balance</small></div><div><strong id="parentEarned">0</strong><small>earned through learning</small></div><div><strong id="parentSpent">0</strong><small>spent on world building</small></div></div><p class="economy-note">KS2C is a closed-loop in-app reward. It cannot be bought, sold, withdrawn, traded or converted to money.</p></section>
       <section class="section panel"><div class="section-title"><h2>Subject mastery</h2><small>0–100%</small></div><div id="parentSubjects"></div></section>
       <section class="section panel"><div class="section-title"><h2>Priority training</h2><small>lowest mastery first</small></div><ul id="parentWeak" class="parent-list"></ul></section>
       <section class="section panel"><div class="section-title"><h2>Recent missions</h2></div><ul id="recentAttempts" class="recent-list"></ul></section>
     </section>
 
-    <section class="view" data-view="tutor" hidden>
-      <section class="panel tutor-box"><span class="eyebrow">AI SIDEKICK</span><h1>✨ Genius Coach</h1><p>Your coach knows which skills need strengthening and can explain, hint, quiz and create a personalised mini-mission.</p><textarea id="tutorInput" placeholder="Example: Fractions keep beating me. Teach me a trick and then challenge me."></textarea><button class="primary" id="askTutor">Summon AI Coach ✨</button><div class="tutor-reply" id="tutorReply">Your coach is ready when you are.</div></section>
-    </section>
+    <section class="view" data-view="tutor" hidden><section class="panel tutor-box"><span class="eyebrow">AI SIDEKICK</span><h1>✨ Genius Coach</h1><p>Your coach knows which skills need strengthening and can explain, hint, quiz and create a personalised mini-mission.</p><textarea id="tutorInput" placeholder="Example: Fractions keep beating me. Teach me a trick and then challenge me."></textarea><button class="primary" id="askTutor">Summon AI Coach ✨</button><div class="tutor-reply" id="tutorReply">Your coach is ready when you are.</div></section></section>
   </main>
 
   <div id="coinToast" class="coin-toast" aria-live="polite">🪙 Reward</div>
   <nav class="bottom-nav"><button data-nav="world"><span>🎮</span>World</button><button data-nav="home"><span>🎯</span>Quests</button><button data-nav="tutor"><span>✨</span>AI Coach</button><button data-nav="parent"><span>🏆</span>Parent</button></nav>
   <script src="/academy.js"></script>
   <script src="/question-safety.js"></script>
-  <script src="/no-repeat.js"></script>
+  <script src="/mission-quality.js"></script>
   <script src="/parent-settings.js"></script>
   <script src="/game-world.js"></script>
   <script src="/chores.js"></script>
+  <script src="/world-nav.js"></script>
   <script type="module" src="/world3d.js"></script>
 </body>
 </html>
