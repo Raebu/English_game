@@ -1,3 +1,4 @@
+@import url('/storybook-theme.css');
 /* Genius Academy premium 3D world */
 .bottom-nav{grid-template-columns:repeat(4,1fr)!important}
 .world-view{position:relative}.world-shell{position:relative;overflow:hidden;border-radius:28px;background:linear-gradient(#5abff5,#b8e9ff 46%,#73ca66 47%);min-height:660px;box-shadow:0 28px 80px rgba(0,0,0,.28)}
