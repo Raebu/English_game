@@ -53,8 +53,8 @@ renderer.toneMappingExposure=1.1;
 
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x63bff7);
-scene.fog=new THREE.Fog(0xa8ddfb,55,145);
-const camera=new THREE.PerspectiveCamera(46,1,.08,260);
+scene.fog=new THREE.Fog(0xa8ddfb,140,480);
+const camera=new THREE.PerspectiveCamera(46,1,.08,650);
 const hemi=new THREE.HemisphereLight(0xe5f7ff,0x4b783f,2.8);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff1cf,4.4);sun.position.set(-18,30,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
 const fill=new THREE.DirectionalLight(0xaad9ff,1.2);fill.position.set(16,12,-20);scene.add(fill);
@@ -67,7 +67,6 @@ loader.load('/models/genius-academy.glb',gltf=>{
   academyModel.traverse(o=>{
     if(!o.isMesh)return;
     o.castShadow=true;o.receiveShadow=true;
-    // Clone materials so camera occlusion can fade one mesh without fading an entire shared material set.
     if(Array.isArray(o.material))o.material=o.material.map(m=>m?.clone?.()||m);
     else if(o.material?.clone)o.material=o.material.clone();
     academyMeshes.push(o);
@@ -103,11 +102,10 @@ function avatar(){
 const player=avatar();
 player.position.set(world.player3d?.x||0,0,world.player3d?.z||15);scene.add(player);
 
-// A slightly higher default angle greatly reduces the chance of entering building walls.
 let cameraDistance=13.5;
 let cameraHeight=9.2;
 const MIN_ZOOM=6.5;
-const MAX_ZOOM=38;
+const MAX_ZOOM=190;
 let moveVector=new THREE.Vector2();
 let targetPoint=null;
 let nearby=null;
@@ -116,7 +114,10 @@ const pointers=new Map();
 let pinchStart=0,pinchDistanceStart=0;
 let gestureDismissed=false;
 
-function heightForZoom(distance){return THREE.MathUtils.clamp(5.8+(distance-6.5)*.48,5.8,21);}
+function heightForZoom(distance){
+  if(distance<=38)return THREE.MathUtils.clamp(5.8+(distance-6.5)*.48,5.8,21);
+  return THREE.MathUtils.clamp(21+(distance-38)*.44,21,88);
+}
 function resize(){const rect=canvas.getBoundingClientRect();renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 
@@ -144,20 +145,16 @@ function pointerMove(e){
 }
 function pointerUp(e){pointers.delete(e.pointerId);moveVector.set(0,0);if(pointers.size<2)pinchStart=0;}
 canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
-canvas.addEventListener('wheel',e=>{e.preventDefault();cameraDistance=THREE.MathUtils.clamp(cameraDistance+e.deltaY*.018,MIN_ZOOM,MAX_ZOOM);cameraHeight=heightForZoom(cameraDistance);},{passive:false});
+canvas.addEventListener('wheel',e=>{e.preventDefault();cameraDistance=THREE.MathUtils.clamp(cameraDistance+e.deltaY*.05,MIN_ZOOM,MAX_ZOOM);cameraHeight=heightForZoom(cameraDistance);},{passive:false});
 
 const groundRaycaster=new THREE.Raycaster();
 canvas.addEventListener('click',e=>{
   if(pointers.size)return;
   const rect=canvas.getBoundingClientRect();const ndc=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
   groundRaycaster.setFromCamera(ndc,camera);const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0);const point=new THREE.Vector3();
-  if(groundRaycaster.ray.intersectPlane(plane,point)){point.x=THREE.MathUtils.clamp(point.x,-20,20);point.z=THREE.MathUtils.clamp(point.z,-18,21);targetPoint=point;showGestureDone();}
+  if(groundRaycaster.ray.intersectPlane(plane,point)){point.x=THREE.MathUtils.clamp(point.x,-24,24);point.z=THREE.MathUtils.clamp(point.z,-24,24);targetPoint=point;showGestureDone();}
 });
 
-// --- Camera occlusion -------------------------------------------------------
-// If a house/tower sits between the child and camera, fade only the intersecting
-// meshes. This keeps the child visible while preserving the solid buildings when
-// they are not blocking the camera.
 const sightRaycaster=new THREE.Raycaster();
 let fadedMeshes=[];
 function materialsOf(mesh){return Array.isArray(mesh.material)?mesh.material:[mesh.material];}
@@ -186,11 +183,9 @@ function applyOcclusionFade(){
   for(const hit of hits){if(seen.has(hit.object))continue;seen.add(hit.object);fadeMesh(hit.object);if(seen.size>=8)break;}
 }
 
-// Use a second ray to prevent the desired camera position from ending up inside
-// a wall. When obstructed, camera rises over the obstruction and comes forward.
 const collisionRaycaster=new THREE.Raycaster();
 function resolveCameraPosition(desired,target){
-  if(!academyModel)return desired;
+  if(!academyModel||cameraDistance>48)return desired;
   const direction=desired.clone().sub(target);const length=direction.length();if(length<1)return desired;
   collisionRaycaster.set(target,direction.normalize());collisionRaycaster.far=length;
   const hits=collisionRaycaster.intersectObjects(academyMeshes,false);
@@ -199,7 +194,6 @@ function resolveCameraPosition(desired,target){
   if(first.distance>=length-1.0)return desired;
   const safeDistance=Math.max(3.1,first.distance-1.0);
   const safe=target.clone().add(direction.normalize().multiplyScalar(safeDistance));
-  // Raise above the blocking roof/wall rather than allowing a wall to fill screen.
   safe.y=Math.max(safe.y,first.point.y+3.8,target.y+6.4);
   return safe;
 }
@@ -209,20 +203,20 @@ function animate(){
   if(moveVector.lengthSq()>.005){vx=moveVector.x;vz=-moveVector.y;moving=true;targetPoint=null;}
   else if(targetPoint){const dir=targetPoint.clone().sub(player.position);dir.y=0;if(dir.length()>1.15){dir.normalize();vx=dir.x;vz=dir.z;moving=true;}else targetPoint=null;}
   if(moving){
-    const speed=5.0;player.position.x+=vx*speed*dt;player.position.z+=vz*speed*dt;player.position.x=THREE.MathUtils.clamp(player.position.x,-20,20);player.position.z=THREE.MathUtils.clamp(player.position.z,-18,21);
+    const speed=5.0;player.position.x+=vx*speed*dt;player.position.z+=vz*speed*dt;player.position.x=THREE.MathUtils.clamp(player.position.x,-24,24);player.position.z=THREE.MathUtils.clamp(player.position.z,-24,24);
     const desired=Math.atan2(vx,vz);player.rotation.y=THREE.MathUtils.lerp(player.rotation.y,desired,.18);player.position.y=Math.abs(Math.sin(performance.now()*.009))*.05;
   }else player.position.y=THREE.MathUtils.lerp(player.position.y,0,.2);
 
   world.player3d={x:player.position.x,z:player.position.z};if(Math.random()<.025)write(WORLD_KEY,world);updateNearby();
 
-  // The further out you pinch, the more overhead the camera becomes. At max zoom
-  // the player can see most of the academy rather than another nearby façade.
-  const target=new THREE.Vector3(player.position.x,player.position.y+1.55,player.position.z-1.8);
+  const overview=Math.max(0,(cameraDistance-38)/(MAX_ZOOM-38));
+  const lookAhead=THREE.MathUtils.lerp(4,18,overview);
+  const target=new THREE.Vector3(player.position.x,player.position.y+1.55,player.position.z-THREE.MathUtils.lerp(1.8,6,overview));
   const desiredCamera=new THREE.Vector3(player.position.x,target.y+cameraHeight,player.position.z+cameraDistance);
   const resolvedCamera=resolveCameraPosition(desiredCamera,target);
   camera.position.lerp(resolvedCamera,.10);
-  camera.lookAt(player.position.x,1.45,player.position.z-(cameraDistance>24?6.5:4.0));
-  applyOcclusionFade();
+  camera.lookAt(player.position.x,THREE.MathUtils.lerp(1.45,0,overview),player.position.z-lookAhead);
+  if(cameraDistance<65)applyOcclusionFade();else restoreOccluders();
   renderer.render(scene,camera);
 }
 animate();
