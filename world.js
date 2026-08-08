@@ -1,0 +1,84 @@
+(() => {
+  const ACADEMY_KEY='ks2genius-v1', WORLD_KEY='ks2-world-v1';
+  const SUBJECT_META={
+    maths:['Number Citadel','➗','#7656ff'],english:['Story Keep','📚','#ff5fa2'],science:['Discovery Lab','🔬','#27c6a4'],computing:['Code Core','💻','#35a8ff'],
+    geography:['Explorer Lodge','🌍','#54b85a'],history:['Time Temple','🏺','#d48c45'],french:['French Café','🇫🇷','#f05f62'],art:['Creator Studio','🎨','#e657d4'],
+    design:['Maker Works','🛠️','#f3a53b'],music:['Sound Stage','🎵','#8d6de9'],pe:['Power Arena','🏃','#ff744f'],life:['Life HQ','🧠','#36b6c9']
+  };
+  const BUILD_ITEMS=[
+    {id:'desk',name:'Genius Desk',icon:'📚',cost:40,desc:'A study desk for your base.'},
+    {id:'garden',name:'Knowledge Garden',icon:'🌳',cost:70,desc:'Grow a garden beside your base.'},
+    {id:'robot',name:'Helper Robot',icon:'🤖',cost:110,desc:'A friendly robot companion.'},
+    {id:'lab',name:'Mini Science Lab',icon:'🔬',cost:150,desc:'Add a lab wing to your base.'},
+    {id:'tower',name:'Trophy Tower',icon:'🏆',cost:220,desc:'Build a tower showing your mastery.'},
+    {id:'portal',name:'Challenge Portal',icon:'🌀',cost:300,desc:'A glowing portal for expert challenges.'}
+  ];
+  const defaultWorld=()=>({coins:0,earned:0,spent:0,owned:[],processedAttempts:[],dailyAwards:{},perfectAwards:[],collectDay:'',collected:[],player:{x:470,y:330},facing:'down'});
+  let state=loadWorld(), canvas,ctx,tip,shop,toast,keys={},raf=0,last=0,audioCtx;
+  const player={x:state.player?.x||470,y:state.player?.y||330,r:13,speed:150};
+  const buildings=[
+    {subject:'maths',x:90,y:80,w:150,h:100},{subject:'english',x:315,y:65,w:150,h:105},{subject:'science',x:545,y:70,w:150,h:105},{subject:'computing',x:760,y:90,w:140,h:100},
+    {subject:'geography',x:70,y:300,w:140,h:95},{subject:'history',x:270,y:285,w:140,h:100},{subject:'french',x:540,y:285,w:140,h:100},{subject:'art',x:755,y:300,w:140,h:95},
+    {subject:'design',x:95,y:480,w:135,h:90},{subject:'music',x:285,y:470,w:135,h:90},{subject:'pe',x:550,y:470,w:135,h:90},{subject:'life',x:755,y:470,w:135,h:90},
+    {base:true,x:400,y:225,w:165,h:105}
+  ];
+  const pickups=[{x:245,y:205},{x:720,y:220},{x:480,y:455},{x:235,y:425},{x:710,y:420}];
+
+  function academy(){try{return JSON.parse(localStorage.getItem(ACADEMY_KEY)||'{}')}catch{return {}}}
+  function loadWorld(){try{return {...defaultWorld(),...JSON.parse(localStorage.getItem(WORLD_KEY)||'{}')}}catch{return defaultWorld()}}
+  function saveWorld(){state.player={x:player.x,y:player.y};localStorage.setItem(WORLD_KEY,JSON.stringify(state));updateHud();}
+  function today(){return new Date().toISOString().slice(0,10)}
+  function ensureCollectibles(){if(state.collectDay!==today()){state.collectDay=today();state.collected=[];saveWorld();}}
+  function addCoins(n,reason){if(n<=0)return;state.coins+=n;state.earned+=n;saveWorld();showToast(`+${n} KS2C`,reason);bleep(720,.09);setTimeout(()=>bleep(930,.12),70)}
+  function spend(n){if(state.coins<n)return false;state.coins-=n;state.spent+=n;saveWorld();return true}
+  function showToast(amount,reason='Reward earned'){if(!toast)return;toast.innerHTML=`🪙 <b>${amount}</b> · ${reason}`;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),2100)}
+  function bleep(freq,dur){try{audioCtx||=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;o.type='square';g.gain.setValueAtTime(.035,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur)}catch{}}
+
+  function processLearningRewards(){
+    const a=academy(), attempts=a.attempts||[]; const known=new Set(state.processedAttempts||[]); let changed=false;
+    attempts.slice(-100).forEach(at=>{if(!known.has(at.id)){known.add(at.id);state.processedAttempts.push(at.id);if(at.correct)addCoins(2,'correct answer');changed=true;}});
+    state.processedAttempts=state.processedAttempts.slice(-1200);
+    const daily=a.daily||{}; if(daily.date){(daily.done||[]).forEach(subject=>{const k=`${daily.date}:${subject}`;if(!state.dailyAwards[k]){state.dailyAwards[k]=1;addCoins(25,'daily mission complete');changed=true;}})}
+    const last10=attempts.slice(-10);if(last10.length===10&&last10.every(x=>x.correct)&&new Set(last10.map(x=>x.subject)).size===1){const sig=last10.map(x=>x.id).join('|');if(!state.perfectAwards.includes(sig)){state.perfectAwards.push(sig);state.perfectAwards=state.perfectAwards.slice(-30);addCoins(20,'perfect 10/10 bonus');changed=true;}}
+    if(changed)saveWorld(); updateParentCoinPanel();
+  }
+
+  function updateHud(){const a=academy();const coin=document.getElementById('worldCoins'),xp=document.getElementById('worldXP'),level=document.getElementById('worldLevel');if(coin)coin.textContent=state.coins;if(xp)xp.textContent=a.xp||0;if(level)level.textContent=Math.floor((a.xp||0)/250)+1;}
+  function updateParentCoinPanel(){['parentCoins','parentEarned','parentSpent'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=[state.coins,state.earned,state.spent][i]});}
+  function showWorld(){document.querySelectorAll('[data-view]').forEach(v=>v.hidden=v.dataset.view!=='world');window.scrollTo({top:0,behavior:'smooth'});resize();updateHud();draw();}
+  function launchSubject(subject){const button=document.querySelector(`[data-subject="${subject}"]`);if(button){button.click();bleep(420,.08)}else{tip.innerHTML='Mission building is loading…';}}
+
+  function nearInteractable(){let best=null,d=Infinity;for(const b of buildings){const cx=b.x+b.w/2,cy=b.y+b.h/2,dist=Math.hypot(player.x-cx,player.y-cy);if(dist<d){d=dist;best=b}}return d<105?best:null}
+  function interact(){const b=nearInteractable();if(!b)return;if(b.base)openShop();else launchSubject(b.subject)}
+  function openShop(){renderShop();shop.hidden=false;bleep(520,.08)}
+  function closeShop(){shop.hidden=true}
+  function renderShop(){const list=document.getElementById('buildShop');if(!list)return;list.innerHTML=BUILD_ITEMS.map(item=>{const owned=state.owned.includes(item.id),can=state.coins>=item.cost;return `<button class="build-item ${owned?'owned':''}" data-build-item="${item.id}" ${owned?'disabled':''}><span class="build-icon">${item.icon}</span><strong>${owned?'✓ ':''}${item.name}</strong><small>${item.desc}</small><span class="cost">${owned?'Built':`🪙 ${item.cost} KS2C`}</span></button>`}).join('');document.getElementById('shopCoins').textContent=state.coins;}
+  function buyItem(id){const item=BUILD_ITEMS.find(x=>x.id===id);if(!item||state.owned.includes(id))return;if(!spend(item.cost)){showToast('Need more KS2C','complete learning missions');return}state.owned.push(id);saveWorld();renderShop();showToast(`-${item.cost} KS2C`,`${item.name} built`);bleep(330,.08);setTimeout(()=>bleep(660,.15),80);draw();}
+
+  function resize(){if(!canvas)return;const ratio=Math.min(devicePixelRatio||1,2);canvas.width=960*ratio;canvas.height=600*ratio;ctx.setTransform(ratio,0,0,ratio,0,0)}
+  function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+  function isoBlock(x,y,w,h,front,top){ctx.fillStyle=front;ctx.fillRect(x,y,w,h);ctx.fillStyle=top;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+10,y-8);ctx.lineTo(x+w+10,y-8);ctx.lineTo(x+w,y);ctx.closePath();ctx.fill();ctx.strokeStyle='rgba(0,0,0,.22)';ctx.strokeRect(x,y,w,h)}
+  function drawGround(){rect(0,0,960,600,'#69c8ff');rect(0,185,960,415,'#6fc45b');for(let x=0;x<960;x+=32)for(let y=190;y<600;y+=32){ctx.fillStyle=((x+y)/32)%2?'rgba(47,135,60,.12)':'rgba(255,255,255,.04)';ctx.fillRect(x,y,31,31)}rect(0,248,960,48,'#d6bb82');rect(445,180,70,420,'#d6bb82');rect(0,398,960,40,'#d6bb82');for(let x=0;x<960;x+=64){rect(x,257,42,3,'rgba(122,93,55,.2)');rect(x,408,42,3,'rgba(122,93,55,.2)')}}
+  function drawBuilding(b){if(b.base)return drawBase(b);const [name,icon,color]=SUBJECT_META[b.subject];const y=b.y;isoBlock(b.x,y,b.w,b.h,color,lighten(color));rect(b.x+8,y+12,b.w-16,24,'rgba(20,25,55,.75)');ctx.fillStyle='#fff';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText(name,b.x+b.w/2,y+29);ctx.font='25px system-ui';ctx.fillText(icon,b.x+b.w/2,y+65);rect(b.x+b.w/2-17,y+b.h-28,34,28,'#273354');rect(b.x+b.w/2-10,y+b.h-20,20,20,'#f8db65')}
+  function lighten(hex){const n=parseInt(hex.slice(1),16),r=Math.min(255,(n>>16)+45),g=Math.min(255,((n>>8)&255)+45),b=Math.min(255,(n&255)+45);return `rgb(${r},${g},${b})`}
+  function drawBase(b){isoBlock(b.x,b.y,b.w,b.h,'#3e5689','#7895cf');rect(b.x+12,b.y+12,b.w-24,25,'#192754');ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 14px system-ui';ctx.fillText('YOUR BASE',b.x+b.w/2,b.y+30);rect(b.x+b.w/2-18,b.y+b.h-30,36,30,'#172342');ctx.font='20px system-ui';ctx.fillText('🏠',b.x+b.w/2,b.y+70);const o=state.owned||[];if(o.includes('garden')){ctx.font='25px system-ui';ctx.fillText('🌳',b.x-18,b.y+b.h-8);ctx.fillText('🌻',b.x+b.w+16,b.y+b.h-5)}if(o.includes('robot')){ctx.font='22px system-ui';ctx.fillText('🤖',b.x+b.w+24,b.y+55)}if(o.includes('lab'))isoBlock(b.x+b.w-25,b.y-34,60,38,'#27aeb1','#79e4d8');if(o.includes('tower')){isoBlock(b.x+16,b.y-55,42,56,'#7656ff','#aa96ff');ctx.font='20px system-ui';ctx.fillText('🏆',b.x+37,b.y-30)}if(o.includes('portal')){ctx.strokeStyle='#54e9ff';ctx.lineWidth=6;ctx.beginPath();ctx.ellipse(b.x+b.w+35,b.y+30,18,32,0,0,Math.PI*2);ctx.stroke()}}
+  function drawPickups(){ensureCollectibles();pickups.forEach((p,i)=>{if(state.collected.includes(i))return;ctx.font='24px system-ui';ctx.textAlign='center';ctx.fillText('🪙',p.x,p.y+Math.sin(Date.now()/250+i)*3)})}
+  function drawPlayer(){ctx.save();ctx.translate(player.x,player.y);ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(0,12,13,6,0,0,Math.PI*2);ctx.fill();rect(-10,-18,20,25,'#5c48dd');rect(-8,-34,16,16,'#f2b28d');rect(-9,-36,18,7,'#2b2344');rect(-13,-12,5,19,'#f2b28d');rect(8,-12,5,19,'#f2b28d');rect(-9,7,7,14,'#26396c');rect(2,7,7,14,'#26396c');ctx.restore()}
+  function draw(){if(!ctx)return;ctx.clearRect(0,0,960,600);drawGround();buildings.forEach(drawBuilding);drawPickups();drawPlayer();const b=nearInteractable();if(tip){if(b)tip.innerHTML=b.base?'<b>ACTION</b> · Open your Base Builder':`<b>ACTION</b> · Enter ${SUBJECT_META[b.subject][0]}`;else tip.innerHTML='Explore the world · collect daily coins · walk to a building to learn';}}
+  function collision(nx,ny){for(const b of buildings){const pad=8;if(nx>b.x-pad&&nx<b.x+b.w+pad&&ny>b.y-25&&ny<b.y+b.h+pad)return true}return nx<12||nx>948||ny<195||ny>585}
+  function update(dt){let dx=0,dy=0;if(keys.ArrowLeft||keys.a)dx--;if(keys.ArrowRight||keys.d)dx++;if(keys.ArrowUp||keys.w)dy--;if(keys.ArrowDown||keys.s)dy++;if(dx||dy){const len=Math.hypot(dx,dy);dx/=len;dy/=len;const nx=player.x+dx*player.speed*dt,ny=player.y+dy*player.speed*dt;if(!collision(nx,player.y))player.x=nx;if(!collision(player.x,ny))player.y=ny;state.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}
+    ensureCollectibles();pickups.forEach((p,i)=>{if(state.collected.includes(i))return;if(Math.hypot(player.x-p.x,player.y-p.y)<28){state.collected.push(i);addCoins(1,'world discovery coin')}});
+  }
+  function loop(t){const dt=Math.min(.035,(t-last)/1000||0);last=t;update(dt);draw();raf=requestAnimationFrame(loop)}
+  function bindHold(button,key){const on=e=>{e.preventDefault();keys[key]=true};const off=e=>{e.preventDefault();keys[key]=false};button.addEventListener('pointerdown',on);button.addEventListener('pointerup',off);button.addEventListener('pointercancel',off);button.addEventListener('pointerleave',off)}
+
+  function install(){
+    canvas=document.getElementById('worldCanvas');if(!canvas)return;ctx=canvas.getContext('2d');tip=document.getElementById('worldTip');shop=document.getElementById('basePanel');toast=document.getElementById('coinToast');resize();ensureCollectibles();
+    window.addEventListener('resize',resize);window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d'].includes(e.key)){keys[e.key]=true;e.preventDefault()}if(e.key==='e'||e.key==='Enter'){if(!shop.hidden)return;interact()}});window.addEventListener('keyup',e=>keys[e.key]=false);
+    document.querySelectorAll('[data-move]').forEach(b=>bindHold(b,b.dataset.move));document.getElementById('worldAction')?.addEventListener('click',interact);document.getElementById('openBase')?.addEventListener('click',openShop);document.getElementById('closeBase')?.addEventListener('click',closeShop);
+    document.addEventListener('click',e=>{const nav=e.target.closest('[data-nav="world"]');if(nav){showWorld();return}const item=e.target.closest('[data-build-item]');if(item)buyItem(item.dataset.buildItem)});
+    setInterval(()=>{processLearningRewards();saveWorld()},900);processLearningRewards();updateHud();updateParentCoinPanel();
+    if(!raf)raf=requestAnimationFrame(loop);
+  }
+  window.addEventListener('DOMContentLoaded',install);
+})();
