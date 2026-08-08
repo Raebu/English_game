@@ -14,6 +14,13 @@
     script.dataset.gaEngagement='1';
     document.head.appendChild(script);
   }
+  if(!document.querySelector('script[data-ga-engagement-extra]')){
+    const script=document.createElement('script');
+    script.src='/engagement-extra.js';
+    script.defer=true;
+    script.dataset.gaEngagementExtra='1';
+    document.head.appendChild(script);
+  }
 
   function syncWorldMode(){
     const world=document.querySelector('[data-view="world"]');
