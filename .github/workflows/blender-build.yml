@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "blender/**"
+      - "blender/*.py"
       - ".github/workflows/blender-build.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-blender-world:
@@ -28,7 +28,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y blender python3-numpy libegl1 libgl1 libglx-mesa0 libopengl0 mesa-utils xvfb
           blender --version
-          ldconfig -p | grep -E 'libEGL.so.1|libGL.so.1' || true
 
       - name: Verify Blender Python dependencies
         run: |
@@ -36,8 +35,7 @@ jobs:
 
       - name: Create output directories
         run: |
-          mkdir -p blender/renders
-          mkdir -p public/models
+          mkdir -p blender/renders public/models
 
       - name: Build Genius Academy scene
         run: |
@@ -49,6 +47,16 @@ jobs:
           test -s public/models/genius-academy.glb
           test -s blender/genius-academy.blend
           ls -lh blender/renders/academy-preview.png public/models/genius-academy.glb blender/genius-academy.blend
+
+      - name: Publish generated game asset
+        run: |
+          git config user.name "Genius Academy Blender Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/models/genius-academy.glb blender/renders/academy-preview.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Update generated Genius Academy world asset [skip ci]"
+            git push origin HEAD:main
+          fi
 
       - name: Upload Blender outputs
         if: always()
