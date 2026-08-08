@@ -3,67 +3,90 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#101735" />
-  <meta name="description" content="Adaptive Year 4 KS2 learning academy with daily missions, mastery tracking, parent progress and AI tutoring." />
+  <meta name="theme-color" content="#08102d" />
+  <meta name="description" content="Adaptive Year 4 KS2 learning adventure with daily missions, mastery tracking, parent progress and AI tutoring." />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/academy.css" />
-  <title>Genius Academy — Year 4 KS2</title>
+  <link rel="stylesheet" href="/game-world.css" />
+  <title>Genius Academy — Year 4 Adventure</title>
 </head>
 <body>
   <main class="app">
     <header class="top">
-      <div class="brand"><div class="brand-badge">🧠</div><div><strong>Genius Academy</strong><small>Year 4 • KS2</small></div></div>
-      <div class="top-actions"><button class="ghost" id="editName">✏️ <span class="label">Name</span></button><button class="ghost" data-nav="parent">👨‍👩‍👧 <span class="label">Parent</span></button></div>
+      <div class="brand"><div class="brand-badge">⚡</div><div><strong>Genius Academy</strong><small>Year 4 Adventure World</small></div></div>
+      <div class="top-actions"><button class="ghost" id="editName">🧑 <span class="label">Avatar</span></button><button class="ghost" data-nav="parent">🏆 <span class="label">Parent HQ</span></button></div>
     </header>
 
     <section class="view" data-view="home">
+      <section class="game-hud" aria-label="Player status">
+        <div class="hud-player"><div class="avatar-cube">🧑‍🚀</div><div><small>Explorer</small><strong id="worldName">Learner</strong></div></div>
+        <div class="hud-chip"><small>Level</small><strong id="worldLevel">1</strong></div>
+        <div class="hud-chip xp"><small>XP</small><strong id="worldXP">0</strong></div>
+        <div class="hud-chip streak"><small>🔥 Streak</small><strong id="worldStreak">1</strong></div>
+      </section>
+
+      <section class="world-stage" aria-label="Learning world">
+        <div class="sky-cloud cloud-a"></div><div class="sky-cloud cloud-b"></div>
+        <div class="quest-ribbon">⚡ DAILY QUEST LIVE</div>
+        <div class="world-title"><span class="eyebrow">YOUR LEARNING UNIVERSE</span><h1>Choose your next zone</h1><p>Every mission builds your world, earns XP and unlocks tougher challenges.</p></div>
+        <div class="zone-map">
+          <button class="zone" data-subject="maths" data-name="maths" data-label="Number Citadel"><div class="zone-building">➗</div><strong>Number Citadel</strong><small>Maths</small></button>
+          <button class="zone" data-subject="english" data-name="english" data-label="Story Kingdom"><div class="zone-building">📚</div><strong>Story Kingdom</strong><small>English</small></button>
+          <button class="zone" data-subject="science" data-name="science" data-label="Discovery Lab"><div class="zone-building">🔬</div><strong>Discovery Lab</strong><small>Science</small></button>
+          <button class="zone" data-subject="computing" data-name="computing" data-label="Code City"><div class="zone-building">💻</div><strong>Code City</strong><small>Computing</small></button>
+          <button class="zone" data-subject="geography" data-name="geography" data-label="Explorer Isles"><div class="zone-building">🌍</div><strong>Explorer Isles</strong><small>Geography</small></button>
+          <button class="zone" data-subject="life" data-name="life skills" data-label="Life HQ"><div class="zone-building">🧠</div><strong>Life HQ</strong><small>Life Skills</small></button>
+        </div>
+      </section>
+
       <section class="hero">
-        <span class="eyebrow">YOUR PERSONALISED LEARNING PLAN</span>
-        <h1>Hi <span id="childName">Learner</span> 👋</h1>
-        <p>Complete today’s missions, strengthen your weakest skills and level up across the whole Year 4 curriculum.</p>
-        <div class="stats"><div class="stat"><strong id="xp">0</strong><small>XP</small></div><div class="stat"><strong id="streak">1</strong><small>day streak</small></div><div class="stat"><strong id="dailyProgress">0/4</strong><small>daily missions</small></div></div>
+        <span class="eyebrow">PERSONALISED QUEST LINE</span>
+        <h1>Ready, <span id="childName">Learner</span>?</h1>
+        <p>Your AI-powered quest line finds the skills that will improve you fastest. Win missions, build streaks, unlock zones and become stronger every day.</p>
+        <div class="stats"><div class="stat"><strong id="xp">0</strong><small>Total XP</small></div><div class="stat"><strong id="streak">1</strong><small>Day streak</small></div><div class="stat"><strong id="dailyProgress">0/4</strong><small>Daily quests</small></div></div>
       </section>
 
       <section class="section daily-card">
-        <div class="daily-head"><strong>🎯 Today’s Smart Plan</strong><span>Adaptive</span></div>
+        <div class="daily-head"><strong>🎯 Today’s Quest Chain</strong><span>Adaptive</span></div>
         <div class="bar"><i id="dailyBar"></i></div>
         <div id="dailySubjects" class="chips"></div>
-        <button id="dailyStart" class="primary">Start mission</button>
+        <button id="dailyStart" class="primary">Launch next mission ⚔️</button>
       </section>
 
-      <section class="section"><div class="section-title"><h2>Subjects</h2><small>Year 4 curriculum</small></div><div id="subjects" class="subjects"></div></section>
-      <section class="section panel"><div class="section-title"><h2>🧭 Skills to strengthen</h2><small>Chosen by the adaptive engine</small></div><ul id="weakSkills" class="weak-list"></ul></section>
+      <section class="section"><div class="section-title"><h2>🌌 All Worlds</h2><small>Choose any subject</small></div><div id="subjects" class="subjects"></div></section>
+      <section class="section panel"><div class="section-title"><h2>🎯 Training Targets</h2><small>Weak skills = bonus XP opportunities</small></div><ul id="weakSkills" class="weak-list"></ul></section>
     </section>
 
     <section class="view" data-view="play" hidden>
-      <div class="play-top"><h1 id="playSubject">📚 English</h1><button class="ghost" data-nav="home">Exit</button></div>
-      <div class="progress"><i id="playBar"></i></div><div class="progress-label"><span id="playProgressText">Question 1 of 10</span><span>Adaptive difficulty</span></div>
-      <section class="build"><div class="build-head"><span>🏗️ Build your Knowledge Tower</span><span id="buildCount">0/10 built</span></div><div id="buildPieces" class="build-pieces"></div></section>
-      <section class="question-card"><span class="skill" id="skillLabel">Skill</span><div class="question" id="question">Question</div><div class="answers" id="answers"></div><div class="feedback" id="feedback" hidden></div><button class="primary next" id="nextQuestion" hidden>Next question →</button></section>
+      <div class="play-top"><h1 id="playSubject">📚 English Mission</h1><button class="ghost" data-nav="home">Retreat</button></div>
+      <div class="progress"><i id="playBar"></i></div><div class="progress-label"><span id="playProgressText">Challenge 1 of 10</span><span>⚡ Adaptive difficulty</span></div>
+      <section class="build"><div class="build-head"><span>🏗️ Construct your Victory Tower</span><span id="buildCount">0/10 blocks</span></div><div id="buildPieces" class="build-pieces"></div></section>
+      <section class="question-card"><span class="skill" id="skillLabel">Mission skill</span><div class="question" id="question">Question</div><div class="answers" id="answers"></div><div class="feedback" id="feedback" hidden></div><button class="primary next" id="nextQuestion" hidden>Next challenge →</button></section>
     </section>
 
     <section class="view" data-view="review" hidden>
-      <div class="review-head"><span class="eyebrow">LEVEL REVIEW</span><h1 id="reviewTitle">Maths Level Review</h1><div class="review-score" id="reviewScore">0/10 correct</div></div>
-      <div class="insight" id="reviewInsight"></div><div id="reviewList" class="review-list"></div><div class="review-footer"><button class="primary" id="finishReview">Continue →</button></div>
+      <div class="review-head"><span class="eyebrow">MISSION DEBRIEF</span><h1 id="reviewTitle">Level Review</h1><div class="review-score" id="reviewScore">0/10 correct</div></div>
+      <div class="insight" id="reviewInsight"></div><div id="reviewList" class="review-list"></div><div class="review-footer"><button class="primary" id="finishReview">Claim rewards →</button></div>
     </section>
 
     <section class="view" data-view="parent" hidden>
       <section class="panel">
-        <div class="parent-hero"><div><span class="eyebrow">PARENT DASHBOARD</span><h1 id="parentChild">Learner</h1><p>Progress is based on question-by-question mastery, not just total scores.</p></div><button class="ghost" style="color:#6c5ce7;border-color:#ddd" data-nav="home">Close</button></div>
+        <div class="parent-hero"><div><span class="eyebrow">PARENT HQ</span><h1 id="parentChild">Learner</h1><p>See exactly what is improving, where support is needed and what the adaptive engine will train next.</p></div><button class="ghost" style="color:#fff" data-nav="home">Close</button></div>
         <div class="parent-stats"><div><strong id="parentAccuracy">0%</strong><small>7-day accuracy</small></div><div><strong id="parentQuestions">0</strong><small>questions / 7 days</small></div><div><strong id="parentXP">0</strong><small>total XP</small></div></div>
       </section>
       <section class="section panel"><div class="section-title"><h2>Subject mastery</h2><small>0–100%</small></div><div id="parentSubjects"></div></section>
-      <section class="section panel"><div class="section-title"><h2>Priority skills</h2><small>lowest mastery first</small></div><ul id="parentWeak" class="parent-list"></ul></section>
-      <section class="section panel"><div class="section-title"><h2>Recent learning</h2></div><ul id="recentAttempts" class="recent-list"></ul></section>
+      <section class="section panel"><div class="section-title"><h2>Priority training</h2><small>lowest mastery first</small></div><ul id="parentWeak" class="parent-list"></ul></section>
+      <section class="section panel"><div class="section-title"><h2>Recent missions</h2></div><ul id="recentAttempts" class="recent-list"></ul></section>
     </section>
 
     <section class="view" data-view="tutor" hidden>
-      <section class="panel tutor-box"><span class="eyebrow">AI COACH</span><h1>Ask your Tutor</h1><p>The tutor is given the child’s weakest skills so it can explain, quiz and coach at Year 4 level. It never needs the API key on the device.</p><textarea id="tutorInput" placeholder="Example: I keep getting fractions wrong. Can you explain them simply and give me one practice question?"></textarea><button class="primary" id="askTutor">Ask tutor ✨</button><div class="tutor-reply" id="tutorReply">Ask a question whenever you need help.</div></section>
+      <section class="panel tutor-box"><span class="eyebrow">AI SIDEKICK</span><h1>✨ Genius Coach</h1><p>Your coach knows which skills need strengthening and can explain, hint, quiz and create a personalised mini-mission.</p><textarea id="tutorInput" placeholder="Example: Fractions keep beating me. Teach me a trick and then challenge me."></textarea><button class="primary" id="askTutor">Summon AI Coach ✨</button><div class="tutor-reply" id="tutorReply">Your coach is ready when you are.</div></section>
     </section>
   </main>
 
-  <nav class="bottom-nav"><button data-nav="home"><span>🏠</span>Learn</button><button data-nav="tutor"><span>✨</span>AI Tutor</button><button data-nav="parent"><span>📈</span>Progress</button></nav>
+  <nav class="bottom-nav"><button data-nav="home"><span>🗺️</span>World</button><button data-nav="tutor"><span>✨</span>AI Coach</button><button data-nav="parent"><span>🏆</span>Parent HQ</button></nav>
   <script src="/academy.js"></script>
   <script src="/parent-settings.js"></script>
+  <script src="/game-world.js"></script>
 </body>
 </html>
