@@ -3,85 +3,66 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6c5ce7" />
-  <meta name="description" content="A fun, level-based English game for learning common, proper and abstract nouns." />
-  <title>Noun Quest — The Ultimate Noun Detective Game</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="build.css" />
+  <meta name="theme-color" content="#101735" />
+  <meta name="description" content="Adaptive Year 4 KS2 learning academy with daily missions, mastery tracking, parent progress and AI tutoring." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="stylesheet" href="/academy.css" />
+  <title>Genius Academy — Year 4 KS2</title>
 </head>
 <body>
-  <div class="stars" aria-hidden="true"></div>
-  <main class="app-shell">
-    <header class="topbar">
-      <button id="soundButton" class="icon-button" type="button" aria-label="Toggle sound" title="Toggle sound">🔊</button>
-      <div class="brand" aria-label="Noun Quest"><span class="brand-mark">🔎</span><div><strong>Noun Quest</strong><small>Detective Academy</small></div></div>
-      <button id="helpButton" class="icon-button" type="button" aria-label="Show noun guide" title="Noun guide">?</button>
+  <main class="app">
+    <header class="top">
+      <div class="brand"><div class="brand-badge">🧠</div><div><strong>Genius Academy</strong><small>Year 4 • KS2</small></div></div>
+      <div class="top-actions"><button class="ghost" id="editName">✏️ <span class="label">Name</span></button><button class="ghost" data-nav="parent">👨‍👩‍👧 <span class="label">Parent</span></button></div>
     </header>
 
-    <section id="homeScreen" class="screen active home-screen" aria-labelledby="homeTitle">
-      <div class="hero-card">
-        <div class="detective-badge" aria-hidden="true"><span class="badge-glow"></span><span class="badge-emoji">🕵️</span></div>
-        <p class="eyebrow">THE ULTIMATE NOUN DETECTIVE CHALLENGE</p>
-        <h1 id="homeTitle">Become a <span>Noun Master!</span></h1>
-        <p class="hero-copy">Complete 10-question levels, build amazing creations with every correct answer, unlock harder missions and climb the Detective Academy ranks.</p>
-        <div class="noun-pills" aria-label="Noun types"><span class="pill common">🎒 Common</span><span class="pill proper">👑 Proper</span><span class="pill abstract">💭 Abstract</span></div>
-        <label class="name-label" for="playerName">Detective name</label>
-        <input id="playerName" class="name-input" maxlength="18" autocomplete="off" placeholder="Enter player name" aria-label="Detective name" />
-        <button id="startButton" class="primary-button" type="button"><span>Start Mission</span><span aria-hidden="true">🚀</span></button>
-        <button id="continueButton" class="secondary-button hidden" type="button">Continue Mission</button>
-      </div>
-      <div class="mini-cards" aria-label="Game features">
-        <article><span>🧩</span><strong>Build It</strong><small>Every right answer adds a piece</small></article>
-        <article><span>🔥</span><strong>Build Streaks</strong><small>Bonus points for runs</small></article>
-        <article><span>🏆</span><strong>Level Up</strong><small>10 questions every level</small></article>
-      </div>
-    </section>
-
-    <section id="gameScreen" class="screen game-screen" aria-live="polite">
-      <div class="status-panel">
-        <div class="level-area"><span class="level-label">LEVEL <strong id="levelNumber">1</strong></span><span id="rankName" class="rank-name">Rookie Detective</span></div>
-        <div class="status-stats"><span title="Score">⭐ <strong id="scoreValue">0</strong></span><span title="Streak">🔥 <strong id="streakValue">0</strong></span><span title="Lives">❤️ <strong id="livesValue">3</strong></span></div>
-      </div>
-      <div class="progress-track" aria-label="Level progress"><div id="progressBar" class="progress-bar"></div></div>
-      <div class="progress-caption"><span id="progressText">Question 1 of 10</span><span id="xpText">0 / 10 correct</span></div>
-
-      <section class="build-card" aria-label="Build challenge">
-        <div class="build-copy"><span class="mission-label">BUILD CHALLENGE</span><h2 id="buildTitle">Detective Tower</h2><p id="buildMessage">Get an answer right to add the first piece!</p></div>
-        <div id="buildGrid" class="build-grid" aria-label="10 piece build progress"></div>
+    <section class="view" data-view="home">
+      <section class="hero">
+        <span class="eyebrow">YOUR PERSONALISED LEARNING PLAN</span>
+        <h1>Hi <span id="childName">Learner</span> 👋</h1>
+        <p>Complete today’s missions, strengthen your weakest skills and level up across the whole Year 4 curriculum.</p>
+        <div class="stats"><div class="stat"><strong id="xp">0</strong><small>XP</small></div><div class="stat"><strong id="streak">1</strong><small>day streak</small></div><div class="stat"><strong id="dailyProgress">0/4</strong><small>daily missions</small></div></div>
       </section>
 
-      <section class="question-card" aria-labelledby="questionPrompt">
-        <div class="mission-row"><span id="missionIcon" class="mission-icon">🔍</span><div><span class="mission-label">YOUR MISSION</span><p id="instructionText">What type of noun is this?</p></div></div>
-        <div id="questionPrompt" class="question-prompt">teacher</div>
-        <div id="questionContext" class="question-context hidden"></div>
-        <div id="answers" class="answers" role="group" aria-label="Answer choices"></div>
-        <div id="feedback" class="feedback hidden" role="status"><div id="feedbackIcon" class="feedback-icon">✨</div><div><strong id="feedbackTitle">Correct!</strong><p id="feedbackMessage"></p></div></div>
-        <button id="nextButton" class="primary-button next-button hidden" type="button">Next Question →</button>
+      <section class="section daily-card">
+        <div class="daily-head"><strong>🎯 Today’s Smart Plan</strong><span>Adaptive</span></div>
+        <div class="bar"><i id="dailyBar"></i></div>
+        <div id="dailySubjects" class="chips"></div>
+        <button id="dailyStart" class="primary">Start mission</button>
       </section>
+
+      <section class="section"><div class="section-title"><h2>Subjects</h2><small>Year 4 curriculum</small></div><div id="subjects" class="subjects"></div></section>
+      <section class="section panel"><div class="section-title"><h2>🧭 Skills to strengthen</h2><small>Chosen by the adaptive engine</small></div><ul id="weakSkills" class="weak-list"></ul></section>
     </section>
 
-    <section id="levelScreen" class="screen celebration-screen" aria-labelledby="levelTitle">
-      <div class="confetti" aria-hidden="true"></div>
-      <div class="celebration-card">
-        <div id="levelEmoji" class="big-emoji">🎉</div><p class="eyebrow">MISSION COMPLETE</p><h2 id="levelTitle">Level cleared!</h2><p id="levelSummary">Fantastic detective work.</p>
-        <div class="results-grid"><div><strong id="levelCorrect">0</strong><span>Correct</span></div><div><strong id="levelAccuracy">0%</strong><span>Accuracy</span></div><div><strong id="levelScore">0</strong><span>Total Score</span></div></div>
-        <div id="unlockCard" class="unlock-card"><span>🔓</span><div><small>NEW RANK</small><strong id="newRank">Word Scout</strong></div></div>
-        <button id="nextLevelButton" class="primary-button" type="button">Level Up! 🚀</button>
-      </div>
+    <section class="view" data-view="play" hidden>
+      <div class="play-top"><h1 id="playSubject">📚 English</h1><button class="ghost" data-nav="home">Exit</button></div>
+      <div class="progress"><i id="playBar"></i></div><div class="progress-label"><span id="playProgressText">Question 1 of 10</span><span>Adaptive difficulty</span></div>
+      <section class="build"><div class="build-head"><span>🏗️ Build your Knowledge Tower</span><span id="buildCount">0/10 built</span></div><div id="buildPieces" class="build-pieces"></div></section>
+      <section class="question-card"><span class="skill" id="skillLabel">Skill</span><div class="question" id="question">Question</div><div class="answers" id="answers"></div><div class="feedback" id="feedback" hidden></div><button class="primary next" id="nextQuestion" hidden>Next question →</button></section>
     </section>
 
-    <section id="gameOverScreen" class="screen celebration-screen" aria-labelledby="gameOverTitle">
-      <div class="celebration-card"><div class="big-emoji">🧠</div><p class="eyebrow">TRAINING CHECKPOINT</p><h2 id="gameOverTitle">Great detective practice!</h2><p>You ran out of hearts, but every mistake makes your noun powers stronger.</p><div class="results-grid two"><div><strong id="finalScore">0</strong><span>Score</span></div><div><strong id="bestLevel">1</strong><span>Best Level</span></div></div><button id="retryButton" class="primary-button" type="button">Try Again 🔄</button><button id="homeButton" class="secondary-button" type="button">Back to Academy</button></div>
+    <section class="view" data-view="review" hidden>
+      <div class="review-head"><span class="eyebrow">LEVEL REVIEW</span><h1 id="reviewTitle">Maths Level Review</h1><div class="review-score" id="reviewScore">0/10 correct</div></div>
+      <div class="insight" id="reviewInsight"></div><div id="reviewList" class="review-list"></div><div class="review-footer"><button class="primary" id="finishReview">Continue →</button></div>
+    </section>
+
+    <section class="view" data-view="parent" hidden>
+      <section class="panel">
+        <div class="parent-hero"><div><span class="eyebrow">PARENT DASHBOARD</span><h1 id="parentChild">Learner</h1><p>Progress is based on question-by-question mastery, not just total scores.</p></div><button class="ghost" style="color:#6c5ce7;border-color:#ddd" data-nav="home">Close</button></div>
+        <div class="parent-stats"><div><strong id="parentAccuracy">0%</strong><small>7-day accuracy</small></div><div><strong id="parentQuestions">0</strong><small>questions / 7 days</small></div><div><strong id="parentXP">0</strong><small>total XP</small></div></div>
+      </section>
+      <section class="section panel"><div class="section-title"><h2>Subject mastery</h2><small>0–100%</small></div><div id="parentSubjects"></div></section>
+      <section class="section panel"><div class="section-title"><h2>Priority skills</h2><small>lowest mastery first</small></div><ul id="parentWeak" class="parent-list"></ul></section>
+      <section class="section panel"><div class="section-title"><h2>Recent learning</h2></div><ul id="recentAttempts" class="recent-list"></ul></section>
+    </section>
+
+    <section class="view" data-view="tutor" hidden>
+      <section class="panel tutor-box"><span class="eyebrow">AI COACH</span><h1>Ask your Tutor</h1><p>The tutor is given the child’s weakest skills so it can explain, quiz and coach at Year 4 level. It never needs the API key on the device.</p><textarea id="tutorInput" placeholder="Example: I keep getting fractions wrong. Can you explain them simply and give me one practice question?"></textarea><button class="primary" id="askTutor">Ask tutor ✨</button><div class="tutor-reply" id="tutorReply">Ask a question whenever you need help.</div></section>
     </section>
   </main>
 
-  <dialog id="guideDialog" class="guide-dialog">
-    <button id="closeGuideButton" class="dialog-close" aria-label="Close guide">×</button><p class="eyebrow">DETECTIVE HANDBOOK</p><h2>Noun Power Guide</h2>
-    <div class="guide-list"><article class="guide-common"><span>🎒</span><div><strong>Common Nouns</strong><p>General names for people, places or things, such as <b>dog</b>, <b>school</b> or <b>bicycle</b>.</p></div></article><article class="guide-proper"><span>👑</span><div><strong>Proper Nouns</strong><p>Special names for particular people, places, days or brands. They begin with a capital letter, like <b>London</b>, <b>Friday</b> or <b>Disney</b>.</p></div></article><article class="guide-abstract"><span>💭</span><div><strong>Abstract Nouns</strong><p>Feelings, ideas and qualities you cannot touch, such as <b>joy</b>, <b>kindness</b> or <b>bravery</b>.</p></div></article></div>
-  </dialog>
-
-  <script src="game.js"></script>
-  <script src="profile.js"></script>
-  <script src="review.js"></script>
+  <nav class="bottom-nav"><button data-nav="home"><span>🏠</span>Learn</button><button data-nav="tutor"><span>✨</span>AI Tutor</button><button data-nav="parent"><span>📈</span>Progress</button></nav>
+  <script src="/academy.js"></script>
 </body>
 </html>
