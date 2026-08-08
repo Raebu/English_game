@@ -72,14 +72,15 @@
     box.innerHTML=`<div class="section-title"><h2>🏠 Household missions</h2><small>${s.done.length} completed today</small></div>${recent.length?`<ul class="recent-list">${recent.map(x=>`<li class="ok"><span>✅ ${x.title}</span><small>+${x.reward} KS2C</small></li>`).join('')}</ul>`:'<p>No household missions completed yet today.</p>'}`;
   }
 
-  function styles(){const st=document.createElement('style');st.textContent=`
+  function styles(){if(document.getElementById('choreStyles'))return;const st=document.createElement('style');st.id='choreStyles';st.textContent=`
     .global-coin-chip{display:flex;align-items:center;gap:5px;white-space:nowrap}.global-coin-chip strong{color:#ffe36b}
     .chore-list{display:grid;gap:9px}.chore-item{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:11px;background:#f4f5fb;border:2px solid #e7e8f2;border-radius:16px;padding:11px}.chore-item.done{background:#e9fff5;border-color:#bcebd7}.chore-icon{font-size:27px}.chore-item strong,.chore-item small{display:block}.chore-item small{color:#69708b;margin-top:3px;line-height:1.35}.chore-item button{border:0;border-radius:12px;padding:10px 12px;background:#6c5ce7;color:#fff;font-weight:900;cursor:pointer}.chore-item button:disabled{background:#7ac9a9;cursor:default}.chore-note{font-size:12px;color:#6f7692;line-height:1.5;margin:11px 2px 0}
     .adult-confirm-shade{position:fixed;z-index:200;inset:0;background:rgba(5,9,28,.78);display:grid;place-items:center;padding:18px}.adult-confirm{width:min(430px,100%);background:#fff;color:#20243d;border-radius:23px;padding:22px;text-align:center}.adult-icon{font-size:42px}.adult-confirm h2{margin:5px 0}.adult-confirm p{color:#606781;line-height:1.45}.adult-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:9px;margin-top:16px}.adult-actions button{border:0;border-radius:13px;padding:12px;font-weight:900;cursor:pointer}.adult-actions .confirm{background:#6c5ce7;color:#fff}
     @media(max-width:600px){.chore-item{grid-template-columns:auto 1fr}.chore-item button{grid-column:1/3;width:100%}.global-coin-chip .label{display:none}}
   `;document.head.appendChild(st)}
 
+  function init(){styles();installTopCoin();installChores();renderParentChores();syncCoinHud()}
   document.addEventListener('click',e=>{const b=e.target.closest('[data-chore]');if(b)confirmChore(b.dataset.chore);if(e.target.closest('[data-nav="parent"]'))setTimeout(renderParentChores,30)});
   window.addEventListener('storage',syncCoinHud);
-  window.addEventListener('DOMContentLoaded',()=>{styles();installTopCoin();installChores();renderParentChores();syncCoinHud()});
+  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
