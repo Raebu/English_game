@@ -1,5 +1,5 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const WORLD_KEY='ks2-world-v1';
 const ACADEMY_KEY='ks2genius-v1';
@@ -65,7 +65,7 @@ loader.load('/models/genius-academy.glb',gltf=>{
   scene.add(academyModel);
   document.body.classList.add('academy-model-ready');
 },undefined,err=>{
-  console.warn('Blender world not published yet; showing lightweight fallback.',err);
+  console.error('Failed to load Genius Academy Blender world.',err);
   buildFallback();
 });
 
@@ -79,7 +79,6 @@ function buildFallback(){
   }
 }
 
-// polished child avatar, kept separate so it can move through the Blender scene
 function avatar(){
   const g=new THREE.Group();
   const mat=(c,r=.65)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
@@ -148,7 +147,6 @@ function pointerUp(e){pointers.delete(e.pointerId);moveVector.set(0,0);if(pointe
 canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
 canvas.addEventListener('wheel',e=>{e.preventDefault();cameraDistance=THREE.MathUtils.clamp(cameraDistance+e.deltaY*.01,6.7,16);cameraHeight=4.6+(cameraDistance-6.7)*.42;},{passive:false});
 
-// Tap in the world to walk there when it is a short tap rather than a drag.
 const raycaster=new THREE.Raycaster();
 canvas.addEventListener('click',e=>{
   if(pointers.size)return;
