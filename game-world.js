@@ -78,3 +78,12 @@
   window.addEventListener('storage',syncHud);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncHud()});
 })();
+
+/* Load quality/reward extensions after the core academy has been defined. */
+['/mission-quality.js','/chores.js'].forEach(src=>{
+  if(document.querySelector(`script[src="${src}"]`))return;
+  const script=document.createElement('script');
+  script.src=src;
+  script.defer=true;
+  document.body.appendChild(script);
+});
