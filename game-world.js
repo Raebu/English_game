@@ -74,16 +74,19 @@
     }).observe(xp,{childList:true,characterData:true,subtree:true});
   }
 
+  function show3DWorld(){
+    document.querySelectorAll('[data-view]').forEach(v=>v.hidden=v.dataset.view!=='world');
+    document.body.classList.add('world-active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>window.dispatchEvent(new Event('resize')),40);
+  }
+
+  document.addEventListener('click',e=>{
+    if(e.target.closest('[data-nav="world"]')){e.preventDefault();show3DWorld();}
+    if(e.target.closest('#finishReview'))setTimeout(show3DWorld,80);
+  },true);
+
   syncHud();wireZones();enhanceSubjectCards();watchRewards();
   window.addEventListener('storage',syncHud);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncHud()});
 })();
-
-/* Load quality/reward extensions after the core academy has been defined. */
-['/mission-quality.js','/chores.js'].forEach(src=>{
-  if(document.querySelector(`script[src="${src}"]`))return;
-  const script=document.createElement('script');
-  script.src=src;
-  script.defer=true;
-  document.body.appendChild(script);
-});
