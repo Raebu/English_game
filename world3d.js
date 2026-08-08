@@ -22,6 +22,7 @@ const SUBJECTS={
   pe:{name:'Power Arena',icon:'🏃',pos:new THREE.Vector3(10.5,0,10.0)},
   life:{name:'Think Tower',icon:'💡',pos:new THREE.Vector3(8.5,0,5.0)}
 };
+
 const BUILD_ITEMS=[
 {id:'desk',name:'Genius Desk',icon:'📚',cost:40,desc:'A study desk for your academy base.'},
 {id:'garden',name:'Knowledge Garden',icon:'🌳',cost:70,desc:'A colourful knowledge garden.'},
@@ -40,8 +41,9 @@ const action=document.getElementById('worldAction');
 const gestureHint=document.getElementById('gestureHint');
 const basePanel=document.getElementById('basePanel');
 const shop=document.getElementById('buildShop');
+
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.7));
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));
 renderer.setClearColor(0x61bdf7);
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -51,31 +53,38 @@ renderer.toneMappingExposure=1.1;
 
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x63bff7);
-scene.fog=new THREE.Fog(0xa8ddfb,34,76);
-const camera=new THREE.PerspectiveCamera(46,1,.1,150);
-const hemi=new THREE.HemisphereLight(0xe5f7ff,0x4b783f,2.8); scene.add(hemi);
-const sun=new THREE.DirectionalLight(0xfff1cf,4.4); sun.position.set(-18,30,18); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048); scene.add(sun);
-const fill=new THREE.DirectionalLight(0xaad9ff,1.2); fill.position.set(16,12,-20); scene.add(fill);
+scene.fog=new THREE.Fog(0xa8ddfb,55,145);
+const camera=new THREE.PerspectiveCamera(46,1,.08,260);
+const hemi=new THREE.HemisphereLight(0xe5f7ff,0x4b783f,2.8);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff1cf,4.4);sun.position.set(-18,30,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+const fill=new THREE.DirectionalLight(0xaad9ff,1.2);fill.position.set(16,12,-20);scene.add(fill);
 
 let academyModel=null;
+const academyMeshes=[];
 const loader=new GLTFLoader();
 loader.load('/models/genius-academy.glb',gltf=>{
   academyModel=gltf.scene;
-  academyModel.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+  academyModel.traverse(o=>{
+    if(!o.isMesh)return;
+    o.castShadow=true;o.receiveShadow=true;
+    // Clone materials so camera occlusion can fade one mesh without fading an entire shared material set.
+    if(Array.isArray(o.material))o.material=o.material.map(m=>m?.clone?.()||m);
+    else if(o.material?.clone)o.material=o.material.clone();
+    academyMeshes.push(o);
+  });
   scene.add(academyModel);
   document.body.classList.add('academy-model-ready');
-},undefined,err=>{
-  console.error('Failed to load Genius Academy Blender world.',err);
-  buildFallback();
-});
+},undefined,err=>{console.error('Failed to load Genius Academy Blender world.',err);buildFallback();});
 
 function fallbackMaterial(c){return new THREE.MeshStandardMaterial({color:c,roughness:.8});}
 function buildFallback(){
-  const ground=new THREE.Mesh(new THREE.CircleGeometry(24,64),fallbackMaterial(0x70c85e));ground.rotation.x=-Math.PI/2;scene.add(ground);
-  const path=new THREE.Mesh(new THREE.BoxGeometry(2,0.08,30),fallbackMaterial(0xe3c38c));path.position.z=3;scene.add(path);
+  const ground=new THREE.Mesh(new THREE.CircleGeometry(40,64),fallbackMaterial(0x70c85e));ground.rotation.x=-Math.PI/2;scene.add(ground);
+  const path=new THREE.Mesh(new THREE.BoxGeometry(2,0.08,38),fallbackMaterial(0xe3c38c));path.position.z=3;scene.add(path);
   for(const [id,s] of Object.entries(SUBJECTS)){
-    const g=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry(3,2.5,3),fallbackMaterial(id==='life'?0x52b9bb:0xe8d2a6));body.position.y=1.25;g.add(body);
-    const roof=new THREE.Mesh(new THREE.ConeGeometry(2.4,1.8,4),fallbackMaterial(id==='science'?0x7d43a7:0x315fad));roof.rotation.y=Math.PI/4;roof.position.y=3.3;g.add(roof);g.position.copy(s.pos);scene.add(g);
+    const g=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.BoxGeometry(3,2.5,3),fallbackMaterial(id==='life'?0x52b9bb:0xe8d2a6));body.position.y=1.25;g.add(body);
+    const roof=new THREE.Mesh(new THREE.ConeGeometry(2.4,1.8,4),fallbackMaterial(id==='science'?0x7d43a7:0x315fad));roof.rotation.y=Math.PI/4;roof.position.y=3.3;g.add(roof);
+    g.position.copy(s.pos);scene.add(g);
   }
 }
 
@@ -87,15 +96,18 @@ function avatar(){
   add(new THREE.SphereGeometry(.50,20,14),mat(0xf0b07e),0,2.25,0);
   const hair=add(new THREE.SphereGeometry(.53,16,10),mat(0x633019),0,2.48,.02);hair.scale.y=.65;
   add(new THREE.BoxGeometry(.78,.95,.32),mat(0x8b552c),0,1.28,.38);
-  for(const x of [-.22,.22]) add(new THREE.CapsuleGeometry(.12,.48,4,8),mat(0x18365d),x,.48,0);
+  for(const x of [-.22,.22])add(new THREE.CapsuleGeometry(.12,.48,4,8),mat(0x18365d),x,.48,0);
   const shoes=mat(0xf5f7ff);for(const x of [-.22,.22])add(new THREE.BoxGeometry(.34,.18,.54),shoes,x,.12,-.08);
   g.scale.set(.82,.82,.82);return g;
 }
 const player=avatar();
-player.position.set(world.player3d?.x||0,0,world.player3d?.z||15);
-scene.add(player);
+player.position.set(world.player3d?.x||0,0,world.player3d?.z||15);scene.add(player);
 
-let cameraDistance=10.5,cameraHeight=6.9;
+// A slightly higher default angle greatly reduces the chance of entering building walls.
+let cameraDistance=13.5;
+let cameraHeight=9.2;
+const MIN_ZOOM=6.5;
+const MAX_ZOOM=38;
 let moveVector=new THREE.Vector2();
 let targetPoint=null;
 let nearby=null;
@@ -104,72 +116,113 @@ const pointers=new Map();
 let pinchStart=0,pinchDistanceStart=0;
 let gestureDismissed=false;
 
-function resize(){
-  const rect=canvas.getBoundingClientRect();
-  renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix();
-}
+function heightForZoom(distance){return THREE.MathUtils.clamp(5.8+(distance-6.5)*.48,5.8,21);}
+function resize(){const rect=canvas.getBoundingClientRect();renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 
-function showGestureDone(){if(gestureDismissed)return;gestureDismissed=true;gestureHint?.classList.add('hide');setTimeout(()=>{if(gestureHint)gestureHint.hidden=true},550)}
-function startSubject(id){
-  const btn=document.querySelector(`[data-subject="${id}"]`);
-  if(btn){btn.click();return;}
-  if(window.startLevel)window.startLevel(id);
-}
+function showGestureDone(){if(gestureDismissed)return;gestureDismissed=true;gestureHint?.classList.add('hide');setTimeout(()=>{if(gestureHint)gestureHint.hidden=true},550);}
+function startSubject(id){const btn=document.querySelector(`[data-subject="${id}"]`);if(btn){btn.click();return;}if(window.startLevel)window.startLevel(id);}
 
 function updateNearby(){
   let best=null,bestD=999;
-  for(const [id,s] of Object.entries(SUBJECTS)){
-    const d=player.position.distanceTo(s.pos);
-    if(d<bestD){bestD=d;best={id,...s,d};}
-  }
+  for(const [id,s] of Object.entries(SUBJECTS)){const d=player.position.distanceTo(s.pos);if(d<bestD){bestD=d;best={id,...s,d};}}
   nearby=bestD<4.2?best:null;
-  if(nearby){
-    nearbyCard.hidden=false; nearbyName.textContent=nearby.name; nearbyIcon.textContent=nearby.icon; nearbyAction.textContent=nearby.d<2.5?'Ready to enter':'Walk closer'; action.hidden=nearby.d>=2.5; action.textContent=`Enter ${nearby.name}`;
-  }else{nearbyCard.hidden=true;action.hidden=true;}
+  if(nearby){nearbyCard.hidden=false;nearbyName.textContent=nearby.name;nearbyIcon.textContent=nearby.icon;nearbyAction.textContent=nearby.d<2.5?'Ready to enter':'Walk closer';action.hidden=nearby.d>=2.5;action.textContent=`Enter ${nearby.name}`;}
+  else{nearbyCard.hidden=true;action.hidden=true;}
 }
-action?.addEventListener('click',()=>{if(nearby)startSubject(nearby.id)});
+action?.addEventListener('click',()=>{if(nearby)startSubject(nearby.id);});
 nearbyCard?.addEventListener('click',()=>{if(nearby){targetPoint=nearby.pos.clone();showGestureDone();}});
 
 function pointerDown(e){
   canvas.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY});targetPoint=null;
-  if(pointers.size===2){const p=[...pointers.values()];pinchStart=Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y);pinchDistanceStart=cameraDistance;moveVector.set(0,0)}
+  if(pointers.size===2){const p=[...pointers.values()];pinchStart=Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y);pinchDistanceStart=cameraDistance;moveVector.set(0,0);}
 }
 function pointerMove(e){
   const p=pointers.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;
-  if(pointers.size===1){
-    const dx=p.x-p.startX,dy=p.y-p.startY,mag=Math.hypot(dx,dy);if(mag>8){moveVector.set(dx,-dy).divideScalar(Math.max(60,mag));moveVector.clampLength(0,1);showGestureDone();}
-  }else if(pointers.size===2){
-    const ps=[...pointers.values()];const dist=Math.hypot(ps[1].x-ps[0].x,ps[1].y-ps[0].y);if(pinchStart>0){cameraDistance=THREE.MathUtils.clamp(pinchDistanceStart*(pinchStart/dist),6.7,16);cameraHeight=4.6+(cameraDistance-6.7)*.42;showGestureDone();}
-  }
+  if(pointers.size===1){const dx=p.x-p.startX,dy=p.y-p.startY,mag=Math.hypot(dx,dy);if(mag>8){moveVector.set(dx,-dy).divideScalar(Math.max(60,mag));moveVector.clampLength(0,1);showGestureDone();}}
+  else if(pointers.size===2){const ps=[...pointers.values()];const dist=Math.hypot(ps[1].x-ps[0].x,ps[1].y-ps[0].y);if(pinchStart>0&&dist>8){cameraDistance=THREE.MathUtils.clamp(pinchDistanceStart*(pinchStart/dist),MIN_ZOOM,MAX_ZOOM);cameraHeight=heightForZoom(cameraDistance);showGestureDone();}}
 }
 function pointerUp(e){pointers.delete(e.pointerId);moveVector.set(0,0);if(pointers.size<2)pinchStart=0;}
 canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);
-canvas.addEventListener('wheel',e=>{e.preventDefault();cameraDistance=THREE.MathUtils.clamp(cameraDistance+e.deltaY*.01,6.7,16);cameraHeight=4.6+(cameraDistance-6.7)*.42;},{passive:false});
+canvas.addEventListener('wheel',e=>{e.preventDefault();cameraDistance=THREE.MathUtils.clamp(cameraDistance+e.deltaY*.018,MIN_ZOOM,MAX_ZOOM);cameraHeight=heightForZoom(cameraDistance);},{passive:false});
 
-const raycaster=new THREE.Raycaster();
+const groundRaycaster=new THREE.Raycaster();
 canvas.addEventListener('click',e=>{
   if(pointers.size)return;
   const rect=canvas.getBoundingClientRect();const ndc=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
-  raycaster.setFromCamera(ndc,camera);const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0);const point=new THREE.Vector3();
-  if(raycaster.ray.intersectPlane(plane,point)){point.x=THREE.MathUtils.clamp(point.x,-17,17);point.z=THREE.MathUtils.clamp(point.z,-13,18);targetPoint=point;showGestureDone();}
+  groundRaycaster.setFromCamera(ndc,camera);const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0);const point=new THREE.Vector3();
+  if(groundRaycaster.ray.intersectPlane(plane,point)){point.x=THREE.MathUtils.clamp(point.x,-20,20);point.z=THREE.MathUtils.clamp(point.z,-18,21);targetPoint=point;showGestureDone();}
 });
 
+// --- Camera occlusion -------------------------------------------------------
+// If a house/tower sits between the child and camera, fade only the intersecting
+// meshes. This keeps the child visible while preserving the solid buildings when
+// they are not blocking the camera.
+const sightRaycaster=new THREE.Raycaster();
+let fadedMeshes=[];
+function materialsOf(mesh){return Array.isArray(mesh.material)?mesh.material:[mesh.material];}
+function restoreOccluders(){
+  for(const mesh of fadedMeshes){for(const m of materialsOf(mesh)){if(!m?.userData?.gaFadeState)continue;const s=m.userData.gaFadeState;m.transparent=s.transparent;m.opacity=s.opacity;m.depthWrite=s.depthWrite;delete m.userData.gaFadeState;}}
+  fadedMeshes=[];
+}
+function fadeMesh(mesh){
+  if(!mesh?.isMesh)return;
+  let changed=false;
+  for(const m of materialsOf(mesh)){
+    if(!m||m.userData.gaFadeState)continue;
+    m.userData.gaFadeState={transparent:m.transparent,opacity:m.opacity,depthWrite:m.depthWrite};
+    m.transparent=true;m.opacity=Math.min(m.opacity??1,.20);m.depthWrite=false;m.needsUpdate=true;changed=true;
+  }
+  if(changed)fadedMeshes.push(mesh);
+}
+function applyOcclusionFade(){
+  restoreOccluders();
+  if(!academyModel)return;
+  const target=new THREE.Vector3(player.position.x,player.position.y+1.55,player.position.z);
+  const toTarget=target.clone().sub(camera.position);const maxDistance=toTarget.length();if(maxDistance<.5)return;
+  sightRaycaster.set(camera.position,toTarget.normalize());sightRaycaster.far=Math.max(0,maxDistance-.45);
+  const hits=sightRaycaster.intersectObjects(academyMeshes,false);
+  const seen=new Set();
+  for(const hit of hits){if(seen.has(hit.object))continue;seen.add(hit.object);fadeMesh(hit.object);if(seen.size>=8)break;}
+}
+
+// Use a second ray to prevent the desired camera position from ending up inside
+// a wall. When obstructed, camera rises over the obstruction and comes forward.
+const collisionRaycaster=new THREE.Raycaster();
+function resolveCameraPosition(desired,target){
+  if(!academyModel)return desired;
+  const direction=desired.clone().sub(target);const length=direction.length();if(length<1)return desired;
+  collisionRaycaster.set(target,direction.normalize());collisionRaycaster.far=length;
+  const hits=collisionRaycaster.intersectObjects(academyMeshes,false);
+  if(!hits.length)return desired;
+  const first=hits[0];
+  if(first.distance>=length-1.0)return desired;
+  const safeDistance=Math.max(3.1,first.distance-1.0);
+  const safe=target.clone().add(direction.normalize().multiplyScalar(safeDistance));
+  // Raise above the blocking roof/wall rather than allowing a wall to fill screen.
+  safe.y=Math.max(safe.y,first.point.y+3.8,target.y+6.4);
+  return safe;
+}
+
 function animate(){
-  requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);let moving=false;
-  let vx=0,vz=0;
+  requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);let moving=false;let vx=0,vz=0;
   if(moveVector.lengthSq()>.005){vx=moveVector.x;vz=-moveVector.y;moving=true;targetPoint=null;}
-  else if(targetPoint){const dir=targetPoint.clone().sub(player.position);dir.y=0;if(dir.length()>1.15){dir.normalize();vx=dir.x;vz=dir.z;moving=true}else targetPoint=null;}
+  else if(targetPoint){const dir=targetPoint.clone().sub(player.position);dir.y=0;if(dir.length()>1.15){dir.normalize();vx=dir.x;vz=dir.z;moving=true;}else targetPoint=null;}
   if(moving){
-    const speed=5.0;player.position.x+=vx*speed*dt;player.position.z+=vz*speed*dt;player.position.x=THREE.MathUtils.clamp(player.position.x,-17,17);player.position.z=THREE.MathUtils.clamp(player.position.z,-13,18);
-    const desired=Math.atan2(vx,vz);player.rotation.y=THREE.MathUtils.lerp(player.rotation.y,desired,.18);
-    player.position.y=Math.abs(Math.sin(performance.now()*.009))*.05;
+    const speed=5.0;player.position.x+=vx*speed*dt;player.position.z+=vz*speed*dt;player.position.x=THREE.MathUtils.clamp(player.position.x,-20,20);player.position.z=THREE.MathUtils.clamp(player.position.z,-18,21);
+    const desired=Math.atan2(vx,vz);player.rotation.y=THREE.MathUtils.lerp(player.rotation.y,desired,.18);player.position.y=Math.abs(Math.sin(performance.now()*.009))*.05;
   }else player.position.y=THREE.MathUtils.lerp(player.position.y,0,.2);
-  world.player3d={x:player.position.x,z:player.position.z};
-  if(Math.random()<.025)write(WORLD_KEY,world);
-  updateNearby();
-  const follow=new THREE.Vector3(player.position.x,player.position.y+1.3,player.position.z+cameraDistance);
-  camera.position.lerp(new THREE.Vector3(follow.x,follow.y+cameraHeight,follow.z),.075);camera.lookAt(player.position.x,1.6,player.position.z-4.3);
+
+  world.player3d={x:player.position.x,z:player.position.z};if(Math.random()<.025)write(WORLD_KEY,world);updateNearby();
+
+  // The further out you pinch, the more overhead the camera becomes. At max zoom
+  // the player can see most of the academy rather than another nearby façade.
+  const target=new THREE.Vector3(player.position.x,player.position.y+1.55,player.position.z-1.8);
+  const desiredCamera=new THREE.Vector3(player.position.x,target.y+cameraHeight,player.position.z+cameraDistance);
+  const resolvedCamera=resolveCameraPosition(desiredCamera,target);
+  camera.position.lerp(resolvedCamera,.10);
+  camera.lookAt(player.position.x,1.45,player.position.z-(cameraDistance>24?6.5:4.0));
+  applyOcclusionFade();
   renderer.render(scene,camera);
 }
 animate();
@@ -186,5 +239,4 @@ function renderShop(){
 }
 document.getElementById('openBase')?.addEventListener('click',()=>{basePanel.hidden=false;renderShop();});
 document.getElementById('closeBase')?.addEventListener('click',()=>basePanel.hidden=true);
-window.addEventListener('storage',refreshHUD);
-window.addEventListener('ks2coins',refreshHUD);
+window.addEventListener('storage',refreshHUD);window.addEventListener('ks2coins',refreshHUD);
