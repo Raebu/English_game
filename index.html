@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#08102d" />
-  <meta name="description" content="Adaptive Year 4 KS2 learning adventure with a navigable world, KS2 Coin rewards, persistent building, parent progress and AI tutoring." />
+  <meta name="description" content="Adaptive Year 4 KS2 learning adventure with a true 3D world, KS2 Coin rewards, persistent building, parent progress and AI tutoring." />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/academy.css" />
   <link rel="stylesheet" href="/game-world.css" />
@@ -19,24 +19,28 @@
     </header>
 
     <section class="view world-view" data-view="world">
-      <section class="world-shell" aria-label="Genius Academy explorable learning world">
-        <div class="world-hud">
-          <div class="world-hud-left"><span class="hud-chip">⭐ LV <strong id="worldLevel">1</strong></span><span class="hud-chip">⚡ <strong id="worldXP">0</strong> XP</span><span class="hud-chip">🪙 <strong id="worldCoins">0</strong> KS2C</span></div>
-          <div class="world-hud-right"><button class="hud-chip hud-button" id="openBase">🏠 BUILD</button><button class="hud-chip hud-button" data-nav="home">📋 QUESTS</button></div>
+      <section class="world-shell" aria-label="Genius Academy 3D learning world">
+        <div class="world-hud minimal-hud">
+          <div class="world-status"><span>LV <strong id="worldLevel">1</strong></span><span class="world-coin">🪙 <strong id="worldCoins">0</strong></span></div>
+          <div class="world-mini-actions"><button id="openBase" class="world-icon-button" aria-label="Open base builder">🏠</button><button class="world-icon-button" data-nav="home" aria-label="Open quests">🎯</button></div>
         </div>
-        <canvas id="worldCanvas" width="960" height="600" aria-label="Walk around Genius Academy and enter subject buildings"></canvas>
-        <div id="worldTip" class="world-tip">Explore the world · walk to a building to learn</div>
+        <canvas id="worldCanvas" aria-label="Walk around the 3D Genius Academy and enter subject buildings"></canvas>
+        <div id="worldTip" class="world-tip" hidden>Walk closer to a building</div>
         <div class="world-controls" aria-label="Movement controls">
-          <div class="dpad"><button class="up" data-move="ArrowUp" aria-label="Move up">▲</button><button class="left" data-move="ArrowLeft" aria-label="Move left">◀</button><button class="down" data-move="ArrowDown" aria-label="Move down">▼</button><button class="right" data-move="ArrowRight" aria-label="Move right">▶</button></div>
-          <button id="worldAction" class="world-action" aria-label="Interact">ACTION<br>⚡</button>
+          <div class="joystick-pad" aria-label="Move character">
+            <button class="up" data-move="ArrowUp" aria-label="Move forward">▲</button>
+            <button class="left" data-move="ArrowLeft" aria-label="Move left">◀</button>
+            <button class="down" data-move="ArrowDown" aria-label="Move backward">▼</button>
+            <button class="right" data-move="ArrowRight" aria-label="Move right">▶</button>
+          </div>
+          <button id="worldAction" class="world-action" aria-label="Interact" hidden>ENTER</button>
         </div>
         <section id="basePanel" class="world-panel" hidden>
-          <div class="world-panel-head"><div><span class="eyebrow">YOUR PERSISTENT BASE</span><h2>🏠 Base Builder</h2></div><button id="closeBase" class="world-close">Close ✕</button></div>
-          <p>Spend KS2 Coins earned through learning to permanently build and customise your world. Balance: <strong>🪙 <span id="shopCoins">0</span> KS2C</strong></p>
+          <div class="world-panel-head"><div><span class="eyebrow">YOUR BASE</span><h2>Build your world</h2></div><button id="closeBase" class="world-close">✕</button></div>
+          <p>Use KS2 Coins earned from learning and helpful real-life missions. Balance: <strong>🪙 <span id="shopCoins">0</span></strong></p>
           <div id="buildShop" class="build-shop"></div>
         </section>
       </section>
-      <div class="world-legend"><span>⌨️ WASD / arrows</span><span>⚡ Enter / E to interact</span><span>🪙 2 KS2C per correct answer</span><span>🎯 +25 daily mission</span><span>🏆 +20 perfect 10/10</span></div>
     </section>
 
     <section class="view" data-view="home" hidden>
@@ -50,7 +54,7 @@
       <section class="world-stage" aria-label="Learning world mission board">
         <div class="sky-cloud cloud-a"></div><div class="sky-cloud cloud-b"></div>
         <div class="quest-ribbon">⚡ DAILY QUEST LIVE</div>
-        <div class="world-title"><span class="eyebrow">QUEST BOARD</span><h1>Choose a mission</h1><p>You can also enter these missions by walking into their buildings in the World.</p></div>
+        <div class="world-title"><span class="eyebrow">QUEST BOARD</span><h1>Choose a mission</h1><p>You can also enter missions by walking into their buildings in the 3D World.</p></div>
         <div class="zone-map">
           <button class="zone" data-subject="maths"><div class="zone-building">➗</div><strong>Number Citadel</strong><small>Maths</small></button>
           <button class="zone" data-subject="english"><div class="zone-building">📚</div><strong>Story Keep</strong><small>English</small></button>
@@ -110,8 +114,10 @@
   <nav class="bottom-nav"><button data-nav="world"><span>🎮</span>World</button><button data-nav="home"><span>🎯</span>Quests</button><button data-nav="tutor"><span>✨</span>AI Coach</button><button data-nav="parent"><span>🏆</span>Parent</button></nav>
   <script src="/academy.js"></script>
   <script src="/question-safety.js"></script>
+  <script src="/no-repeat.js"></script>
   <script src="/parent-settings.js"></script>
   <script src="/game-world.js"></script>
-  <script src="/world.js"></script>
+  <script src="/chores.js"></script>
+  <script type="module" src="/world3d.js"></script>
 </body>
 </html>
