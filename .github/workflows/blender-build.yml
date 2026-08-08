@@ -1,0 +1,52 @@
+name: Build Genius Academy Blender World
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "blender/**"
+      - ".github/workflows/blender-build.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-blender-world:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+          blender --version
+
+      - name: Create output directories
+        run: |
+          mkdir -p blender/renders
+          mkdir -p public/models
+
+      - name: Build Genius Academy scene
+        run: |
+          blender --background --python blender/build_academy.py
+
+      - name: Verify outputs
+        run: |
+          test -s blender/renders/academy-preview.png
+          test -s public/models/genius-academy.glb
+          ls -lh blender/renders/academy-preview.png public/models/genius-academy.glb
+
+      - name: Upload Blender outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: genius-academy-blender-world
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            blender/renders/academy-preview.png
+            blender/genius-academy.blend
+            public/models/genius-academy.glb
