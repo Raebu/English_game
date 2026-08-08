@@ -1,5 +1,4 @@
 (() => {
-  // Load the engagement/progression layer everywhere without coupling it to the quiz engine.
   if(!document.querySelector('link[data-ga-engagement]')){
     const link=document.createElement('link');
     link.rel='stylesheet';
@@ -7,11 +6,11 @@
     link.dataset.gaEngagement='1';
     document.head.appendChild(link);
   }
-  if(!document.querySelector('script[data-ga-engagement]')){
+  if(!document.querySelector('script[data-ga-engagement-core]')){
     const script=document.createElement('script');
-    script.src='/engagement.js';
+    script.src='/engagement-core.js';
     script.defer=true;
-    script.dataset.gaEngagement='1';
+    script.dataset.gaEngagementCore='1';
     document.head.appendChild(script);
   }
   if(!document.querySelector('script[data-ga-engagement-extra]')){
