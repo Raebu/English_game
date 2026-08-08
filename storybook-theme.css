@@ -1,0 +1,46 @@
+/* Genius Academy — cohesive storybook game theme */
+:root{--ga-sky:#55b9f5;--ga-navy:#173965;--ga-navy2:#0c274f;--ga-gold:#f7b72b;--ga-cream:#fff7df;--ga-stone:#ead6a9;--ga-green:#4f9e45;--ga-wood:#7b4525;--ga-shadow:0 18px 45px rgba(21,50,75,.24)}
+html,body{background:linear-gradient(#54b8f5 0,#bde8ff 34%,#72b85e 64%,#477f3e 100%) fixed;color:#fff}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(circle at 20% 12%,rgba(255,255,255,.38),transparent 24%),linear-gradient(180deg,transparent 55%,rgba(18,55,39,.2));}
+.app{max-width:1050px}.top{background:linear-gradient(180deg,rgba(24,67,111,.96),rgba(24,67,111,.78),transparent)}
+.brand-badge{background:radial-gradient(circle at 35% 30%,#7ee7ff,#2997ea 54%,#195ba9);border:3px solid #fff1c8;box-shadow:0 5px 0 #173d70,0 9px 22px rgba(0,0,0,.25)}
+.ghost,.premium-icon-button,.premium-pill{border:3px solid #f7e6b4!important;background:linear-gradient(#2e5f9f,#173b72 55%,#112b55)!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.38),0 4px 0 #0d294f,0 8px 18px rgba(10,33,62,.28)!important;text-shadow:0 2px 1px rgba(0,0,0,.35)}
+.premium-icon-button{border-radius:19px!important;background:linear-gradient(#4dcaff,#1687db 62%,#0c5aa4)!important;font-size:24px!important}
+.premium-pill{font-size:16px!important}.level-pill .pill-icon{filter:drop-shadow(0 2px 1px #0b4e96)}
+.coin-pill{background:linear-gradient(#3c6494,#183a6c)!important}.coin-orb{background:radial-gradient(circle at 35% 28%,#fff2a4,#ffc62f 50%,#e68e00 78%,#a95f00)!important;border:2px solid #fff0a3;box-shadow:inset 0 0 0 3px #d98b00,0 3px 0 #8b5200!important}
+.world-shell{background:linear-gradient(#55b9f5,#a9e3ff 42%,#75bd65 43%)}
+#worldCanvas{background:linear-gradient(#55b9f5,#a9e3ff 42%,#75bd65 43%)}
+.gesture-hint{bottom:46px!important}.gesture-hand{font-size:44px!important}.gesture-hint strong{font-size:17px!important}.gesture-hint small{font-size:13px!important}
+.nearby-card{border:3px solid #ffe5a3!important;background:linear-gradient(#315686,#142f5d)!important;box-shadow:0 5px 0 #0a2144,0 10px 22px rgba(0,0,0,.26)!important;border-radius:18px!important}
+.floating-enter,.primary{border:2px solid #fff0b5!important;background:linear-gradient(180deg,#ffd85a,#f7a826 64%,#dc7913)!important;color:#51300c!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.65),0 5px 0 #a95b12,0 10px 22px rgba(91,51,10,.25)!important;text-shadow:0 1px rgba(255,255,255,.45)}
+.floating-enter:active,.primary:active{transform:translateY(3px)}
+
+/* Mission / quest screens become illustrated game panels */
+.view:not(.world-view){position:relative}.view:not(.world-view):before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 75% 10%,rgba(255,255,255,.5),transparent 22%),linear-gradient(180deg,#55b9f5 0,#a9e3ff 34%,#72b75d 34%,#579746 100%)}
+.hero,.daily-card,.panel,.question-card,.review-item,.parent-coin-panel{border:3px solid rgba(255,247,218,.95)!important;background:linear-gradient(180deg,#fffdf4,#f6ecd4)!important;box-shadow:inset 0 2px 0 #fff,0 6px 0 rgba(109,76,44,.2),var(--ga-shadow)!important;color:#28344b!important}
+.hero,.question-card{border-radius:28px!important}.hero h1,.question,.review-head h1,.parent-hero h1{font-family:ui-rounded,"SF Pro Rounded","Trebuchet MS",system-ui,sans-serif;text-shadow:0 2px 0 #fff}
+.eyebrow,.skill{color:#2865ac!important}.hero h1 span{background:linear-gradient(90deg,#236cc4,#8056c5);-webkit-background-clip:text;background-clip:text}
+.stat,.parent-stats div,.parent-coin-grid div{background:linear-gradient(#eef8ff,#dcefff)!important;border:2px solid #b9d9ef!important;box-shadow:inset 0 1px #fff}
+.stat strong,.parent-stats strong{color:#2465ab!important}
+.daily-card{position:relative;overflow:hidden}.daily-card:after{content:"✦";position:absolute;right:16px;top:8px;color:#f6bb2f;font-size:44px;opacity:.18}
+.bar,.progress{background:#c9d9de!important;border:2px solid rgba(255,255,255,.75);height:13px!important}.bar i,.progress i{background:linear-gradient(90deg,#3b9cf2,#ffd34e)!important}
+.task-chip{background:#e8f4fd!important;border:1px solid #bedaf0!important}.task-chip.done{background:#dff5da!important;border-color:#9ccf91!important}
+.subjects{gap:14px}.subject-card{background:linear-gradient(180deg,#fffdf4,#f2e4c5)!important;border:3px solid #fff2c3!important;box-shadow:inset 0 2px #fff,0 5px 0 rgba(103,74,38,.2),0 12px 24px rgba(32,70,89,.16)!important;transition:.18s transform}.subject-card:hover,.subject-card:active{transform:translateY(-3px) scale(1.01)}.subject-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:linear-gradient(#7bd7ff,#2a91e3);border:2px solid #dff6ff;box-shadow:0 3px 0 #1a68ad}
+
+/* Play screen: wooden/stone quest board aesthetic */
+.play-top h1{display:inline-flex;background:linear-gradient(#2f639e,#173c70);border:3px solid #ffe6a3;border-radius:18px;padding:9px 15px;box-shadow:0 4px 0 #0c294f;text-shadow:0 2px rgba(0,0,0,.25)}
+.build{background:linear-gradient(180deg,rgba(47,92,140,.96),rgba(20,52,93,.97))!important;border:3px solid #e8d08e!important;box-shadow:0 5px 0 #102b4f!important}.build-head{color:#fff5d6!important}.build-block{background:rgba(255,255,255,.20)!important}.build-block.on{background:linear-gradient(#ffd65a,#f09a1b)!important;box-shadow:0 2px 0 #9b5810,0 0 15px rgba(255,209,86,.45)!important}
+.question-card{position:relative;overflow:hidden}.question-card:before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:linear-gradient(90deg,#2865ac,#f6b72b,#7c57c4)}
+.answer{background:linear-gradient(#fff,#f2e8d1)!important;border:3px solid #d4be93!important;box-shadow:0 4px 0 #b49a6c!important;border-radius:18px!important}.answer:active{transform:translateY(3px);box-shadow:0 1px 0 #b49a6c!important}.answer.correct{background:linear-gradient(#e8ffde,#c8efb7)!important;border-color:#65a759!important;box-shadow:0 4px 0 #467b3f!important}.answer.wrong{background:linear-gradient(#ffe8e2,#ffc8bc)!important;border-color:#d76957!important;box-shadow:0 4px 0 #9f483b!important}
+.feedback{border:2px solid #a9cfc0!important}.feedback.bad{border-color:#e4a69b!important}
+
+/* Review, parent and AI coach */
+.review-score{display:inline-block;background:linear-gradient(#ffd95b,#eca11d);color:#57360a!important;border:3px solid #fff0b4;border-radius:18px;padding:8px 14px;box-shadow:0 4px 0 #a9600f}.insight{border:3px solid #f0d283!important;box-shadow:0 4px 0 #b99642}.review-item{border-left:8px solid #64aa58!important}.review-item.wrong{border-left-color:#d75d50!important}.review-item .why{background:#e9f3f8!important;border:1px solid #c9dde8}
+.parent-hero{background:linear-gradient(135deg,#2867ad,#163c73);color:white;border-radius:19px;padding:18px}.parent-hero h1{color:#fff;text-shadow:0 2px rgba(0,0,0,.2)}.parent-coin-panel{background:linear-gradient(#fff4c4,#ffe49a)!important}.economy-note{color:#6b5737!important}
+.tutor-box{position:relative}.tutor-box:before{content:"✨";position:absolute;right:18px;top:12px;font-size:45px}.tutor-box textarea{background:#fffdf5!important;border:3px solid #ceb98d!important;box-shadow:inset 0 2px 8px rgba(80,54,25,.08)}.tutor-reply{background:#e8f4fd!important;border:2px solid #b9d8ed!important}
+
+/* Navigation feels like game tabs rather than browser chrome */
+.bottom-nav{background:linear-gradient(180deg,rgba(30,68,111,.97),rgba(12,38,74,.98))!important;border-top:3px solid #e9d295!important;box-shadow:0 -5px 20px rgba(13,42,71,.22)}.bottom-nav button{color:#e8f3ff!important;text-shadow:0 1px rgba(0,0,0,.35)}.bottom-nav button:active{transform:scale(.96)}
+.world-panel{background:linear-gradient(180deg,rgba(37,77,124,.98),rgba(14,42,80,.99))!important;border:3px solid #f4dfa1!important;box-shadow:inset 0 2px rgba(255,255,255,.2),0 10px 35px rgba(0,0,0,.35)!important}.build-item{background:linear-gradient(#fff8df,#ead9b3)!important;color:#27354c!important;border:3px solid #fff1bd!important;box-shadow:0 4px 0 #a98757!important}.build-item small{color:#667184!important}.build-item .cost{color:#7a4f08!important}.build-item.owned{background:linear-gradient(#e5f8d9,#bfe5b0)!important;border-color:#86bd77!important}
+
+@media(max-width:600px){.premium-pill{padding:0 10px!important}.world-hud-left,.world-hud-right{gap:7px!important}.premium-icon-button{width:48px!important;height:48px!important}.hero,.daily-card,.panel,.question-card{border-width:2px!important}.gesture-hint{bottom:34px!important}}
