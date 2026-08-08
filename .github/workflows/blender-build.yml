@@ -37,6 +37,10 @@ jobs:
         run: |
           mkdir -p blender/renders public/models
 
+      - name: Normalise Blender 4.0 Eevee engine name
+        run: |
+          sed -i 's/BLENDER_EEVEE_NEXT/BLENDER_EEVEE/g' blender/build_academy.py
+
       - name: Build Genius Academy scene
         run: |
           xvfb-run -a -s "-screen 0 1920x1080x24" blender --background --python blender/build_academy.py
