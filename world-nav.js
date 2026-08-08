@@ -1,50 +1,38 @@
 (() => {
-  function setWorldMode(active){
-    document.body.classList.toggle('world-active', active);
-    if(!active){
-      document.documentElement.style.overflow='';
-      document.body.style.overflow='';
-    }
+  // Load the engagement/progression layer everywhere without coupling it to the quiz engine.
+  if(!document.querySelector('link[data-ga-engagement]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='/engagement.css';
+    link.dataset.gaEngagement='1';
+    document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-ga-engagement]')){
+    const script=document.createElement('script');
+    script.src='/engagement.js';
+    script.defer=true;
+    script.dataset.gaEngagement='1';
+    document.head.appendChild(script);
   }
 
+  function syncWorldMode(){
+    const world=document.querySelector('[data-view="world"]');
+    document.body.classList.toggle('world-active',!!world&&!world.hidden);
+  }
   function showWorld(){
     document.querySelectorAll('[data-view]').forEach(v=>{v.hidden=v.dataset.view!=='world'});
-    setWorldMode(true);
+    syncWorldMode();
     window.scrollTo({top:0,behavior:'smooth'});
     window.dispatchEvent(new Event('resize'));
   }
-
-  function leaveWorld(){
-    setWorldMode(false);
-    requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
-  }
-
   document.addEventListener('click',e=>{
-    const nav=e.target.closest('[data-nav]');
-    if(nav){
-      const destination=nav.dataset.nav;
-      if(destination==='world'){
-        e.preventDefault();
-        showWorld();
-        return;
-      }
-      leaveWorld();
-    }
-
+    if(e.target.closest('[data-nav="world"]')){e.preventDefault();showWorld();return;}
+    if(e.target.closest('[data-nav]'))setTimeout(syncWorldMode,0);
     if(e.target.closest('#finishReview'))setTimeout(showWorld,60);
   },true);
-
-  // Keep the scroll lock exactly in sync even when another script changes views.
-  const syncWorldMode=()=>{
-    const world=document.querySelector('[data-view="world"]');
-    setWorldMode(Boolean(world && !world.hidden));
-  };
-
+  const observer=new MutationObserver(syncWorldMode);
   window.addEventListener('DOMContentLoaded',()=>{
+    document.querySelectorAll('[data-view]').forEach(v=>observer.observe(v,{attributes:true,attributeFilter:['hidden']}));
     syncWorldMode();
-    const app=document.querySelector('.app');
-    if(app){
-      new MutationObserver(syncWorldMode).observe(app,{subtree:true,attributes:true,attributeFilter:['hidden']});
-    }
   });
 })();
