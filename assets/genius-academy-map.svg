@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1149" height="1369" viewBox="0 0 1149 1369">
+<defs>
+  <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8fdf64"/><stop offset="1" stop-color="#58b94f"/></linearGradient>
+  <linearGradient id="water" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#49c6ef"/><stop offset="1" stop-color="#167ac8"/></linearGradient>
+  <linearGradient id="road" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#efd58f"/><stop offset=".5" stop-color="#f7e4a9"/><stop offset="1" stop-color="#e5c77c"/></linearGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#1b4b35" flood-opacity=".28"/></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="8"/></filter>
+  <symbol id="tree" viewBox="0 0 54 76"><rect x="23" y="48" width="9" height="23" rx="3" fill="#87552f"/><circle cx="27" cy="30" r="23" fill="#2f9849"/><circle cx="18" cy="24" r="15" fill="#57b957"/><circle cx="35" cy="21" r="14" fill="#75ca61"/></symbol>
+  <symbol id="pine" viewBox="0 0 50 80"><rect x="22" y="58" width="7" height="18" fill="#795033"/><path d="M25 3 4 39h12L5 59h40L34 39h12z" fill="#2a9752"/><path d="M25 12 13 37h8l-8 15h24l-8-15h8z" fill="#57bd68"/></symbol>
+  <symbol id="bridge" viewBox="0 0 90 48"><path d="M7 34Q45 4 83 34" fill="none" stroke="#6e4326" stroke-width="9"/><path d="M8 27Q45 0 82 27" fill="none" stroke="#d69a4d" stroke-width="13"/><path d="M17 20v18M31 12v19M45 8v19M59 12v19M73 20v18" stroke="#6e4326" stroke-width="3"/></symbol>
+  <symbol id="house" viewBox="0 0 150 150"><rect x="25" y="55" width="100" height="75" rx="10" fill="#fff4d6" stroke="#ddb86e" stroke-width="4"/><path d="M15 65 75 20l60 45z" fill="var(--roof,#d75952)" stroke="#a35b3a" stroke-width="4"/><rect x="64" y="95" width="23" height="35" rx="5" fill="#6c90b6"/><rect x="36" y="78" width="18" height="18" rx="3" fill="#bce9ff"/><rect x="98" y="78" width="18" height="18" rx="3" fill="#bce9ff"/></symbol>
+</defs>
+<!-- landscape -->
+<rect width="1149" height="1369" fill="url(#grass)"/>
+<path d="M0 0h1149v150c-170-52-305-37-438-10-172 35-312 43-711 0z" fill="#67c8ee" opacity=".9"/>
+<path d="M0 138c180-58 331-50 490-10 173 43 360 37 659-13v115H0z" fill="#96e071"/>
+<!-- distant hills -->
+<path d="M0 206Q115 90 230 202T458 202T691 196T919 202T1149 198V292H0z" fill="#70c85b" opacity=".65"/>
+<path d="M0 244Q145 139 300 238T615 236T905 236T1149 224V325H0z" fill="#62b854" opacity=".6"/>
+<!-- river and lake -->
+<path d="M0 392C95 352 150 356 205 406s42 118 5 170S126 690 169 765s-17 145-95 190S22 1125 0 1190z" fill="url(#water)" stroke="#d1f2ff" stroke-width="9"/>
+<path d="M58 1102c95-72 207-38 231 45 25 89-53 174-161 156-102-16-143-121-70-201z" fill="url(#water)" stroke="#b9edff" stroke-width="9"/>
+<!-- waterfall -->
+<path d="M274 112c50 5 70 36 56 83-14 48-58 64-89 34-30-30-7-104 33-117z" fill="#8adcf7"/>
+<path d="M266 121c4 46-21 64-20 103M285 121c0 52-17 78-19 108M305 131c-1 43-11 70-22 91" fill="none" stroke="#e7fbff" stroke-width="7" stroke-linecap="round"/>
+<!-- winding road network -->
+<g fill="none" stroke="url(#road)" stroke-width="42" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M570 1215C555 1080 590 990 570 900S540 760 571 660 590 540 572 442 565 325 576 250"/>
+ <path d="M572 330C470 350 393 385 318 438S199 497 117 505"/>
+ <path d="M572 390C675 393 748 385 825 357S956 338 1052 365"/>
+ <path d="M571 608C473 599 405 611 335 652S226 731 161 807"/>
+ <path d="M571 608C663 576 745 559 826 573S950 642 1010 705"/>
+ <path d="M570 810C477 817 425 857 385 913S310 996 204 1021"/>
+ <path d="M570 810C662 812 723 853 768 906S864 973 988 948"/>
+ <path d="M568 1043C687 1028 801 1042 920 1121"/>
+</g>
+<g fill="none" stroke="#fff4c9" stroke-width="5" stroke-dasharray="16 18" stroke-linecap="round" opacity=".8">
+ <path d="M570 1215C555 1080 590 990 570 900S540 760 571 660 590 540 572 442 565 325 576 250"/>
+ <path d="M572 330C470 350 393 385 318 438S199 497 117 505"/><path d="M572 390C675 393 748 385 825 357S956 338 1052 365"/>
+ <path d="M571 608C473 599 405 611 335 652S226 731 161 807"/><path d="M571 608C663 576 745 559 826 573S950 642 1010 705"/>
+ <path d="M570 810C477 817 425 857 385 913S310 996 204 1021"/><path d="M570 810C662 812 723 853 768 906S864 973 988 948"/>
+</g>
+<!-- bridges -->
+<use href="#bridge" x="111" y="420" width="95" height="55" transform="rotate(18 158 448)"/><use href="#bridge" x="115" y="695" width="95" height="55" transform="rotate(-14 162 722)"/>
+<!-- dense scenery trees -->
+<g opacity=".98">
+<use href="#tree" x="62" y="233" width="54" height="76"/><use href="#pine" x="118" y="263" width="50" height="80"/><use href="#tree" x="183" y="212" width="54" height="76"/><use href="#tree" x="343" y="190" width="54" height="76"/><use href="#pine" x="418" y="232" width="50" height="80"/><use href="#tree" x="708" y="194" width="54" height="76"/><use href="#pine" x="788" y="232" width="50" height="80"/><use href="#tree" x="1000" y="222" width="54" height="76"/>
+<use href="#tree" x="49" y="540" width="54" height="76"/><use href="#pine" x="261" y="514" width="50" height="80"/><use href="#tree" x="328" y="524" width="54" height="76"/><use href="#tree" x="684" y="471" width="54" height="76"/><use href="#pine" x="886" y="486" width="50" height="80"/><use href="#tree" x="1051" y="526" width="54" height="76"/>
+<use href="#pine" x="267" y="713" width="50" height="80"/><use href="#tree" x="344" y="750" width="54" height="76"/><use href="#tree" x="728" y="706" width="54" height="76"/><use href="#pine" x="824" y="749" width="50" height="80"/><use href="#tree" x="1070" y="780" width="54" height="76"/>
+<use href="#tree" x="255" y="982" width="54" height="76"/><use href="#pine" x="336" y="1052" width="50" height="80"/><use href="#tree" x="728" y="1027" width="54" height="76"/><use href="#pine" x="844" y="1010" width="50" height="80"/><use href="#tree" x="1040" y="1083" width="54" height="76"/>
+<use href="#tree" x="109" y="1215" width="54" height="76"/><use href="#pine" x="340" y="1202" width="50" height="80"/><use href="#tree" x="748" y="1207" width="54" height="76"/><use href="#pine" x="957" y="1200" width="50" height="80"/>
+</g>
+<!-- central academy castle -->
+<g filter="url(#shadow)" transform="translate(482 125)">
+ <rect x="24" y="76" width="140" height="112" rx="11" fill="#f5e8c8" stroke="#c2aa80" stroke-width="5"/>
+ <rect x="0" y="91" width="48" height="97" rx="7" fill="#f2e4c4" stroke="#c2aa80" stroke-width="5"/><rect x="140" y="91" width="48" height="97" rx="7" fill="#f2e4c4" stroke="#c2aa80" stroke-width="5"/>
+ <path d="M-9 92 24 35l33 57M131 91l33-56 33 56M57 77l37-68 37 68" fill="#2965b4" stroke="#174778" stroke-width="5"/>
+ <rect x="77" y="135" width="35" height="53" rx="16" fill="#8a633d"/><rect x="71" y="99" width="46" height="25" rx="5" fill="#245fa8"/><text x="94" y="118" text-anchor="middle" font-size="20">⚡</text>
+ <path d="M94 8v-35" stroke="#79552e" stroke-width="5"/><path d="M95-27l31 9-31 10z" fill="#ff773b"/>
+</g>
+<rect x="492" y="308" width="168" height="42" rx="13" fill="#1657a1" stroke="#fff2bf" stroke-width="4"/><text x="576" y="336" fill="white" font-family="system-ui,sans-serif" font-size="20" font-weight="800" text-anchor="middle">Genius Academy</text>
+<!-- subject buildings -->
+<g font-family="system-ui,sans-serif" font-weight="800" text-anchor="middle">
+ <g transform="translate(232 205)" style="--roof:#d94b45" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">📚</text><rect x="13" y="129" width="124" height="34" rx="9" fill="#c8443e"/><text x="75" y="153" fill="#fff" font-size="17">Story Keep</text></g>
+ <g transform="translate(346 374)" style="--roof:#d59632" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="35">➗</text><rect x="19" y="129" width="112" height="34" rx="9" fill="#b97728"/><text x="75" y="153" fill="#fff" font-size="17">Math Manor</text></g>
+ <g transform="translate(83 446)" style="--roof:#f1b42d" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">🛠️</text><rect x="12" y="129" width="126" height="34" rx="9" fill="#c78a18"/><text x="75" y="153" fill="#fff" font-size="16">Maker Works</text></g>
+ <g transform="translate(352 566)" style="--roof:#3d86c7" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">🔬</text><rect x="11" y="129" width="128" height="34" rx="9" fill="#2873b9"/><text x="75" y="153" fill="#fff" font-size="17">Science Lab</text></g>
+ <g transform="translate(832 292)" style="--roof:#df5b9b" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">🎨</text><rect x="22" y="129" width="106" height="34" rx="9" fill="#cc4e90"/><text x="75" y="153" fill="#fff" font-size="17">Studio</text></g>
+ <g transform="translate(682 469)" style="--roof:#7652a5" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="36">🎵</text><rect x="11" y="129" width="128" height="34" rx="9" fill="#6a3ba1"/><text x="75" y="153" fill="#fff" font-size="16">Sound Stage</text></g>
+ <g transform="translate(853 631)" filter="url(#shadow)"><path d="M15 115h120v22H15z" fill="#d7d0b5"/><path d="M25 64h100v53H25z" fill="#f0ead1" stroke="#9c967f" stroke-width="4"/><path d="M15 65 75 20l60 45z" fill="#496e43" stroke="#345638" stroke-width="4"/><path d="M42 66v50M62 66v50M88 66v50M108 66v50" stroke="#b4ad91" stroke-width="8"/><text x="75" y="97" font-size="34">🏺</text><rect x="14" y="129" width="122" height="34" rx="9" fill="#3e7152"/><text x="75" y="153" fill="#fff" font-size="16">Time Temple</text></g>
+ <g transform="translate(110 780)" style="--roof:#31558e" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">🇫🇷</text><rect x="7" y="129" width="136" height="34" rx="9" fill="#c33f40"/><text x="75" y="153" fill="#fff" font-size="16">French Café</text></g>
+ <g transform="translate(347 845)" style="--roof:#3f8d43" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">🌍</text><rect x="1" y="129" width="148" height="34" rx="9" fill="#28743a"/><text x="75" y="153" fill="#fff" font-size="15">Explorer Lodge</text></g>
+ <g transform="translate(602 846)" style="--roof:#5a45a0" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">💻</text><rect x="22" y="129" width="106" height="34" rx="9" fill="#6047aa"/><text x="75" y="153" fill="#fff" font-size="17">Code Core</text></g>
+ <g transform="translate(874 855)" style="--roof:#36945d" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">🏃</text><rect x="11" y="129" width="128" height="34" rx="9" fill="#2d824b"/><text x="75" y="153" fill="#fff" font-size="16">Power Arena</text></g>
+ <g transform="translate(488 672)" style="--roof:#d39534" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="35">💡</text><rect x="15" y="129" width="120" height="34" rx="9" fill="#c1842e"/><text x="75" y="153" fill="#fff" font-size="16">Think Tower</text></g>
+ <g transform="translate(484 1045)" style="--roof:#2268a8" filter="url(#shadow)"><use href="#house" width="150" height="150"/><text x="75" y="92" font-size="34">⭐</text><rect x="3" y="129" width="144" height="34" rx="9" fill="#d39218"/><text x="75" y="153" fill="#fff" font-size="16">Base &amp; Shop</text></g>
+</g>
+<!-- track -->
+<ellipse cx="930" cy="1165" rx="122" ry="66" fill="#c66e41" transform="rotate(-10 930 1165)"/><ellipse cx="930" cy="1165" rx="95" ry="43" fill="#69b948" transform="rotate(-10 930 1165)"/><ellipse cx="930" cy="1165" rx="108" ry="54" fill="none" stroke="#f4d6b2" stroke-width="3" transform="rotate(-10 930 1165)"/>
+<!-- decorative rocks/flowers -->
+<g fill="#7ca56d" opacity=".75"><circle cx="793" cy="330" r="9"/><circle cx="323" cy="329" r="7"/><circle cx="744" cy="679" r="8"/><circle cx="301" cy="879" r="9"/><circle cx="1015" cy="1037" r="8"/><circle cx="380" cy="1170" r="7"/></g>
+<g fill="#fff6a3"><circle cx="446" cy="334" r="4"/><circle cx="735" cy="395" r="4"/><circle cx="319" cy="714" r="4"/><circle cx="786" cy="806" r="4"/><circle cx="456" cy="1033" r="4"/></g>
+</svg>
