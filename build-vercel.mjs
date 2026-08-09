@@ -9,7 +9,7 @@ await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 
 for (const name of await readdir(root)) {
-  if (['dist', 'api', 'android', 'blender', 'node_modules', '.git', '.github', 'public'].includes(name)) continue;
+  if (['dist', 'api', 'android', 'blender', 'node_modules', '.git', '.github', 'public', 'assets'].includes(name)) continue;
   const full = join(root, name);
   const info = await stat(full);
   if (info.isFile() && allowed.has(extname(name).toLowerCase())) {
@@ -17,10 +17,12 @@ for (const name of await readdir(root)) {
   }
 }
 
-try {
-  await cp(join(root, 'public'), out, { recursive: true });
-} catch {
-  // public is optional
+for (const dir of ['public', 'assets']) {
+  try {
+    await cp(join(root, dir), dir === 'public' ? out : join(out, dir), { recursive: true });
+  } catch {
+    // optional static directory
+  }
 }
 
-console.log('Prepared Genius Academy static site in dist/');
+console.log('Prepared Genius Academy static site in dist/ with static assets.');
