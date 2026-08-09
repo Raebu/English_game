@@ -1,7 +1,7 @@
 (()=>{
 const WORLD_KEY='ks2-world-v1';
 const ACADEMY_KEY='ks2genius-v1';
-const IMG_SRC='/assets/genius-academy-reference-map.png';
+const IMG_SRC='/assets/genius-academy-map.svg';
 const IMG_W=1149,IMG_H=1369;
 const read=(k,f={})=>{try{return {...f,...JSON.parse(localStorage.getItem(k)||'{}')}}catch{return f}};
 const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
@@ -17,7 +17,7 @@ const BASE={x:559,y:1115,r:88};
 const canvas=document.getElementById('worldCanvas'),ctx=canvas?.getContext('2d');if(!canvas||!ctx)return;
 const nearbyCard=document.getElementById('worldNearby'),nearbyName=document.getElementById('nearbyName'),nearbyIcon=document.getElementById('nearbyIcon'),nearbyAction=document.getElementById('nearbyAction'),action=document.getElementById('worldAction'),basePanel=document.getElementById('basePanel'),shop=document.getElementById('buildShop');
 const shell=document.querySelector('.world-shell');
-const image=new Image(); image.decoding='async'; image.src=IMG_SRC+'?v=16';
+const image=new Image(); image.decoding='async'; image.src=IMG_SRC+'?v=17';
 let player=world.playerMap||{x:563,y:742};
 let camera={x:player.x,y:player.y,scale:1};
 let target=null,nearby=null,drag=null,last=performance.now(),loaded=false,loadFailed=false,userPanning=false,panRelease=0;
@@ -32,7 +32,7 @@ addEventListener('resize',resize);resize();
 function worldToScreen(p){const r=canvas.getBoundingClientRect();return{x:(p.x-camera.x)*camera.scale+r.width/2,y:(p.y-camera.y)*camera.scale+r.height/2};}
 function screenToWorld(x,y){const r=canvas.getBoundingClientRect();return{x:camera.x+(x-r.width/2)/camera.scale,y:camera.y+(y-r.height/2)/camera.scale};}
 function draw(){const r=canvas.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle=loadFailed?'#10233d':'#67c85a';ctx.fillRect(0,0,r.width,r.height);if(loaded){const dw=IMG_W*camera.scale,dh=IMG_H*camera.scale,dx=r.width/2-camera.x*camera.scale,dy=r.height/2-camera.y*camera.scale;ctx.drawImage(image,dx,dy,dw,dh);}else if(loadFailed){ctx.fillStyle='#fff';ctx.font='700 18px system-ui';ctx.textAlign='center';ctx.fillText('Map failed to load — tap to retry',r.width/2,r.height/2);}const p=worldToScreen(player);ctx.save();ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowBlur=10;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,19,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.font='26px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🧑‍🚀',p.x,p.y);ctx.restore();}
-function retryImage(){loadFailed=false;image.src=IMG_SRC+'?v=16&t='+Date.now();}
+function retryImage(){loadFailed=false;image.src=IMG_SRC+'?v=17&t='+Date.now();}
 image.onload=()=>{loaded=true;loadFailed=false;camera.x=player.x;camera.y=player.y;fitCamera();draw();};
 image.onerror=()=>{loaded=false;loadFailed=true;draw();};
 function nearestSubject(){let best=null,bd=Infinity;for(const [id,s] of Object.entries(SUBJECTS)){const d=Math.hypot(player.x-s.x,player.y-s.y);if(d<bd){bd=d;best={id,...s,d}}}return bd<120?best:null;}
@@ -41,7 +41,7 @@ function startSubject(id){document.querySelector(`[data-subject="${id}"]`)?.clic
 action?.addEventListener('click',()=>nearby&&startSubject(nearby.id));
 nearbyCard?.addEventListener('click',()=>{if(nearby)target={x:nearby.x,y:nearby.y};});
 function moveToward(dt){if(!target)return;const dx=target.x-player.x,dy=target.y-player.y,d=Math.hypot(dx,dy);if(d<5){target=null;write(WORLD_KEY,{...world,playerMap:player});return;}const speed=165;player.x+=dx/d*speed*dt;player.y+=dy/d*speed*dt;world.playerMap={x:player.x,y:player.y};if(Math.random()<.04)write(WORLD_KEY,world);}
-function followCamera(){if(userPanning||performance.now()<panRelease)return;const desiredX=player.x,desiredY=player.y;camera.x+=(desiredX-camera.x)*.085;camera.y+=(desiredY-camera.y)*.085;clampCamera();}
+function followCamera(){if(userPanning||performance.now()<panRelease)return;camera.x+=(player.x-camera.x)*.085;camera.y+=(player.y-camera.y)*.085;clampCamera();}
 function tick(now){const dt=Math.min((now-last)/1000,.05);last=now;moveToward(dt);followCamera();updateNearby();draw();requestAnimationFrame(tick);}requestAnimationFrame(tick);
 canvas.addEventListener('pointerdown',e=>{if(loadFailed){retryImage();return;}canvas.setPointerCapture?.(e.pointerId);drag={id:e.pointerId,sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY,moved:false};target=null;userPanning=true;});
 canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>7)drag.moved=true;if(drag.moved){camera.x-=dx/camera.scale;camera.y-=dy/camera.scale;clampCamera();drag.x=e.clientX;drag.y=e.clientY;}});
