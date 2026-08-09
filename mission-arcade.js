@@ -1,0 +1,57 @@
+(()=>{
+const MECHANICS=['bubble','portal','blast','forge','stack','orbit'];
+let timer=null,seconds=12,combo=0;
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const norm=s=>String(s).trim().toLowerCase().replace(/[’']/g,"'").replace(/\s+/g,' ');
+const answerOptions=q=>[...new Set([q.answer,...(q.choices||[])])].slice(0,6);
+function clearTimer(){if(timer){clearInterval(timer);timer=null}}
+function hud(){return `<div class="mission-arcade-hud"><span>🔥 <b id="maCombo">${combo}</b>x combo</span><span>⏱️ <b id="maTime">${seconds}</b>s</span><span>⭐ ${app.level.correct}/${app.level.index}</span></div>`}
+function startArcadeLevel(subject,{daily=false}={}){
+  clearTimer();combo=0;
+  app.level={subject,daily,number:1,index:0,total:10,correct:0,review:[],build:0};
+  show('play');renderPlayHeader();nextArcadeChallenge();
+}
+function startClock(){clearTimer();seconds=Math.max(7,14-Math.floor(app.level.index/3));const el=()=>document.querySelector('#maTime');if(el())el().textContent=seconds;timer=setInterval(()=>{seconds--;if(el())el().textContent=seconds;if(seconds<=0){clearTimer();resolveArcade('__timeout__')}},1000)}
+function nextArcadeChallenge(){
+  if(app.level.index>=app.level.total)return finishLevel();
+  app.answerLocked=false;app.current=chooseAdaptiveQuestion(app.level.subject);
+  const q=app.current,mechanic=MECHANICS[app.level.index%MECHANICS.length];
+  qs('#skillLabel').textContent=`${q.skill} · ${mechanicName(mechanic)}`;
+  qs('#question').innerHTML=`${hud()}<div class="mission-prompt">${esc(q.prompt).replace(/\n/g,'<br>')}</div>`;
+  qs('#feedback').hidden=true;qs('#nextQuestion').hidden=true;
+  renderMechanic(mechanic,q);renderPlayHeader();startClock();
+}
+function mechanicName(x){return {bubble:'Comet Catch',portal:'Portal Dash',blast:'Target Blast',forge:'Answer Forge',stack:'Sky Stack',orbit:'Orbit Match'}[x]}
+function renderMechanic(type,q){const host=qs('#answers');host.className='answers mission-arcade-stage';host.innerHTML='';
+  if(type==='forge')return renderForge(host,q);
+  const opts=shuffle(answerOptions(q));
+  if(type==='bubble')return renderBubble(host,opts);
+  if(type==='portal')return renderPortal(host,opts);
+  if(type==='blast')return renderBlast(host,opts);
+  if(type==='stack')return renderStack(host,opts);
+  renderOrbit(host,opts);
+}
+function button(txt,cls=''){const b=document.createElement('button');b.className=cls;b.dataset.value=txt;b.innerHTML=`<span>${esc(txt)}</span>`;b.onclick=()=>resolveArcade(txt);return b}
+function renderBubble(host,opts){host.classList.add('ma-bubble-field');opts.forEach((o,i)=>{const b=button(o,'ma-comet');b.style.setProperty('--x',`${8+(i*19)%82}%`);b.style.setProperty('--delay',`${-(i*.55)}s`);b.style.setProperty('--speed',`${4.6+(i%3)*.55}s`);host.append(b)})}
+function renderPortal(host,opts){host.classList.add('ma-portal-field');const road=document.createElement('div');road.className='ma-road';host.append(road);opts.slice(0,4).forEach((o,i)=>{const b=button(o,'ma-portal');b.style.setProperty('--lane',i);host.append(b)});const p=document.createElement('div');p.className='ma-runner';p.textContent='🧑‍🚀';host.append(p)}
+function renderBlast(host,opts){host.classList.add('ma-blast-field');const core=document.createElement('div');core.className='ma-core';core.textContent='⚡';host.append(core);opts.forEach((o,i)=>{const b=button(o,'ma-target');b.style.setProperty('--a',`${i*(360/opts.length)}deg`);host.append(b)})}
+function renderForge(host,q){host.classList.add('ma-forge');host.innerHTML=`<div class="ma-forge-machine"><div class="ma-forge-icon">⚒️</div><input id="maInput" autocomplete="off" autocapitalize="sentences" spellcheck="false" aria-label="Type your answer" placeholder="Type the answer…"><button id="maFire" class="ma-fire">Forge answer 🔥</button><small>No answer buttons — recall it yourself.</small></div>`;const input=host.querySelector('#maInput');host.querySelector('#maFire').onclick=()=>resolveArcade(input.value);input.onkeydown=e=>{if(e.key==='Enter')resolveArcade(input.value)};setTimeout(()=>input.focus(),50)}
+function renderStack(host,opts){host.classList.add('ma-stack-field');host.innerHTML='<div class="ma-sky"><div class="ma-stack-base"></div></div><div class="ma-block-bank"></div>';const bank=host.querySelector('.ma-block-bank');opts.forEach((o,i)=>{const b=button(o,'ma-answer-block');b.style.setProperty('--i',i);bank.append(b)})}
+function renderOrbit(host,opts){host.classList.add('ma-orbit-field');host.innerHTML='<div class="ma-orbit-planet">🪐</div>';opts.forEach((o,i)=>{const b=button(o,'ma-orb');b.style.setProperty('--i',i);b.style.setProperty('--count',opts.length);host.append(b)})}
+function resolveArcade(choice){
+  if(app.answerLocked)return;app.answerLocked=true;clearTimer();
+  const q=app.current,correct=norm(choice)===norm(q.answer);
+  recordAttempt(q,choice==='__timeout__'?'Timed out':choice,correct);
+  app.level.review.push({...q,chosen:choice==='__timeout__'?'Timed out':choice,correct});
+  if(correct){combo++;app.level.correct++;app.level.build++;app.state.xp+=(combo>=3?combo:0);saveState();renderBuild()}else combo=0;
+  const fb=qs('#feedback');fb.hidden=false;fb.className='feedback '+(correct?'good':'bad');
+  fb.innerHTML=correct?`<strong>⚡ ${combo>=3?`Combo x${combo}!`:'Hit!'}</strong><p>${esc(q.explain)}</p>`:`<strong>${choice==='__timeout__'?'⏱️ Time!':'💥 Miss!'}</strong><p>Answer: <b>${esc(q.answer)}</b>. ${esc(q.explain)}</p>`;
+  qs('#playBar').style.width=`${(app.level.index+1)/app.level.total*100}%`;
+  setTimeout(()=>{app.level.index++;nextArcadeChallenge()},correct?650:1050);
+}
+function patchLabels(){const p=qs('#playProgressText');if(p&&app.level)p.textContent=`Mini-game ${app.level.index+1} of ${app.level.total}`}
+const originalRenderPlayHeader=window.renderPlayHeader;
+if(typeof originalRenderPlayHeader==='function')window.renderPlayHeader=function(){originalRenderPlayHeader();patchLabels()};
+window.startLevel=startArcadeLevel;
+window.GeniusMissionArcade={start:startArcadeLevel};
+})();
