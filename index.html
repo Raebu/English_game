@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/game-world.css" />
   <link rel="stylesheet" href="/world.css" />
   <link rel="stylesheet" href="/mini-games.css" />
+  <link rel="stylesheet" href="/mission-arcade.css" />
   <script type="importmap">
     {
       "imports": {
@@ -78,9 +79,9 @@
 
     <section class="view" data-view="play" hidden>
       <div class="play-top"><h1 id="playSubject">📚 English Mission</h1><button class="ghost" data-nav="world">Return to World</button></div>
-      <div class="progress"><i id="playBar"></i></div><div class="progress-label"><span id="playProgressText">Challenge 1 of 10</span><span>⚡ Adaptive difficulty</span></div>
+      <div class="progress"><i id="playBar"></i></div><div class="progress-label"><span id="playProgressText">Mini-game 1 of 10</span><span>⚡ Adaptive difficulty</span></div>
       <section class="build"><div class="build-head"><span>🏗️ Construct your Victory Tower</span><span id="buildCount">0/10 blocks</span></div><div id="buildPieces" class="build-pieces"></div></section>
-      <section class="question-card"><span class="skill" id="skillLabel">Mission skill</span><div class="question" id="question">Question</div><div class="answers" id="answers"></div><div class="feedback" id="feedback" hidden></div><button class="primary next" id="nextQuestion" hidden>Next challenge →</button></section>
+      <section class="question-card"><span class="skill" id="skillLabel">Mission skill</span><div class="question" id="question">Mission</div><div class="answers" id="answers"></div><div class="feedback" id="feedback" hidden></div><button class="primary next" id="nextQuestion" hidden>Next challenge →</button></section>
     </section>
 
     <section class="view" data-view="review" hidden>
@@ -109,6 +110,7 @@
   <script src="/chores.js"></script>
   <script src="/world-nav.js"></script>
   <script src="/mini-games.js"></script>
+  <script src="/mission-arcade.js"></script>
   <script type="module" src="/world3d.js"></script>
 </body>
 </html>
