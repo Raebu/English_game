@@ -4,21 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#5fbdf7" />
-  <meta name="description" content="Adaptive Year 4 KS2 learning adventure with a rich 3D academy world, KS2 Coin rewards, parent progress and AI tutoring." />
+  <meta name="description" content="Adaptive Year 4 KS2 learning adventure with an interactive 2D academy map, KS2 Coin rewards, parent progress and AI tutoring." />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/academy.css" />
   <link rel="stylesheet" href="/game-world.css" />
   <link rel="stylesheet" href="/world.css" />
   <link rel="stylesheet" href="/mini-games.css" />
   <link rel="stylesheet" href="/mission-arcade.css" />
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
-      }
-    }
-  </script>
   <title>Genius Academy — Year 4 Adventure</title>
 </head>
 <body>
@@ -29,7 +21,7 @@
     </header>
 
     <section class="view world-view" data-view="world">
-      <section class="world-shell" aria-label="Genius Academy 3D learning world">
+      <section class="world-shell" aria-label="Genius Academy interactive 2D learning map">
         <div class="world-hud premium-hud">
           <div class="world-hud-left">
             <span class="premium-pill level-pill"><span class="pill-icon">⭐</span><span>LV <strong id="worldLevel">1</strong></span></span>
@@ -40,7 +32,7 @@
             <button class="premium-icon-button" data-nav="home" aria-label="Open quests">📜</button>
           </div>
         </div>
-        <canvas id="worldCanvas" aria-label="Explore Genius Academy. Drag to walk. Pinch to zoom. Tap a building to approach it."></canvas>
+        <canvas id="worldCanvas" aria-label="Explore Genius Academy on a 2D map. Drag to walk. Pinch to zoom. Tap a building to approach it."></canvas>
         <div id="worldNearby" class="nearby-card" hidden><span id="nearbyIcon">📚</span><div><strong id="nearbyName">Story Keep</strong><small id="nearbyAction">Tap to enter</small></div></div>
         <div id="gestureHint" class="gesture-hint"><div class="gesture-hand">☝️</div><strong>Drag to move</strong><small>Pinch to zoom · tap a building to approach</small></div>
         <button id="worldAction" class="floating-enter" hidden>Enter</button>
@@ -61,7 +53,7 @@
       </section>
       <section class="world-stage" aria-label="Learning world mission board">
         <div class="quest-ribbon">⚡ DAILY QUEST LIVE</div>
-        <div class="world-title"><span class="eyebrow">QUEST BOARD</span><h1>Choose a mission</h1><p>Or explore the academy world and walk into a subject building.</p></div>
+        <div class="world-title"><span class="eyebrow">QUEST BOARD</span><h1>Choose a mission</h1><p>Or explore the academy map and walk into a subject building.</p></div>
         <div class="zone-map">
           <button class="zone" data-subject="maths"><div class="zone-building">➗</div><strong>Math Manor</strong><small>Maths</small></button>
           <button class="zone" data-subject="english"><div class="zone-building">📚</div><strong>Story Keep</strong><small>English</small></button>
@@ -111,6 +103,6 @@
   <script src="/world-nav.js"></script>
   <script src="/mini-games.js"></script>
   <script src="/mission-arcade.js"></script>
-  <script type="module" src="/world3d.js"></script>
+  <script src="/world2d.js"></script>
 </body>
 </html>
