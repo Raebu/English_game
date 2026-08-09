@@ -1,0 +1,1 @@
+This release uses assets/genius-academy-reference-map.jpg as the approved visual world backdrop. Do not replace it with a schematic redraw.
