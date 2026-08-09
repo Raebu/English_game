@@ -1,4 +1,4 @@
-const CACHE='genius-academy-v14-reference-map';
+const CACHE='genius-academy-v15-map-asset-published';
 const CORE=[
   '/',
   '/academy.css',
@@ -22,6 +22,56 @@ const CORE=[
   '/manifest.webmanifest',
   '/assets/genius-academy-reference-map.jpg'
 ];
-self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));});
-self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)));await self.clients.claim();const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});await Promise.all(clients.map(async client=>{try{const url=new URL(client.url);if(url.origin!==self.location.origin)return;if(url.searchParams.get('gaReferenceMap')==='1')return;url.searchParams.set('gaReferenceMap','1');await client.navigate(url.href);}catch{}}));})());});
-self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.pathname.startsWith('/api/'))return;if(event.request.mode==='navigate'){event.respondWith((async()=>{try{const response=await fetch(event.request,{cache:'no-store'});const cache=await caches.open(CACHE);await cache.put('/',response.clone());return response;}catch{return (await caches.match('/'))||Response.error();}})());return;}event.respondWith((async()=>{try{const response=await fetch(event.request,{cache:'no-cache'});if(response&&response.ok&&url.origin===self.location.origin){const cache=await caches.open(CACHE);await cache.put(event.request,response.clone());}return response;}catch{return (await caches.match(event.request))||Response.error();}})());});
+
+self.addEventListener('install',event=>{
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
+});
+
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)));
+    await self.clients.claim();
+    const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+    await Promise.all(clients.map(async client=>{
+      try{
+        const url=new URL(client.url);
+        if(url.origin!==self.location.origin)return;
+        if(url.searchParams.get('gaMapV15')==='1')return;
+        url.searchParams.set('gaMapV15','1');
+        await client.navigate(url.href);
+      }catch{}
+    }));
+  })());
+});
+
+self.addEventListener('fetch',event=>{
+  if(event.request.method!=='GET')return;
+  const url=new URL(event.request.url);
+  if(url.pathname.startsWith('/api/'))return;
+  if(event.request.mode==='navigate'){
+    event.respondWith((async()=>{
+      try{
+        const response=await fetch(event.request,{cache:'no-store'});
+        const cache=await caches.open(CACHE);
+        await cache.put('/',response.clone());
+        return response;
+      }catch{
+        return (await caches.match('/'))||Response.error();
+      }
+    })());
+    return;
+  }
+  event.respondWith((async()=>{
+    try{
+      const response=await fetch(event.request,{cache:'no-cache'});
+      if(response&&response.ok&&url.origin===self.location.origin){
+        const cache=await caches.open(CACHE);
+        await cache.put(event.request,response.clone());
+      }
+      return response;
+    }catch{
+      return (await caches.match(event.request))||Response.error();
+    }
+  })());
+});
