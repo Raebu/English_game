@@ -11,13 +11,38 @@ const BUILD_ITEMS=[
 {id:'desk',name:'Genius Desk',icon:'📚',cost:40,desc:'A study desk for your academy base.'},{id:'garden',name:'Knowledge Garden',icon:'🌳',cost:70,desc:'A colourful knowledge garden.'},{id:'robot',name:'Helper Robot',icon:'🤖',cost:110,desc:'A friendly learning companion.'},{id:'lab',name:'Mini Science Lab',icon:'🔬',cost:150,desc:'A glowing experiment wing.'},{id:'tower',name:'Trophy Tower',icon:'🏆',cost:220,desc:'Display your mastery trophies.'},{id:'portal',name:'Challenge Portal',icon:'🌀',cost:300,desc:'Unlock an expert challenge portal.'}
 ];
 const SUBJECTS={
- english:{name:'Story Keep',icon:'📚',x:307,y:274,r:86},maths:{name:'Math Manor',icon:'➗',x:421,y:444,r:82},design:{name:'Maker Works',icon:'🛠️',x:158,y:516,r:84},science:{name:'Science Lab',icon:'🔬',x:427,y:636,r:82},art:{name:'Creator Studio',icon:'🎨',x:907,y:362,r:86},music:{name:'Sound Stage',icon:'🎵',x:757,y:539,r:82},history:{name:'Time Temple',icon:'🏺',x:928,y:701,r:86},french:{name:'French Café',icon:'🇫🇷',x:185,y:850,r:82},geography:{name:'Explorer Lodge',icon:'🌍',x:422,y:915,r:82},computing:{name:'Code Core',icon:'💻',x:677,y:916,r:82},pe:{name:'Power Arena',icon:'🏃',x:949,y:925,r:84},life:{name:'Think Tower',icon:'💡',x:563,y:742,r:72}
+ english:{name:'Story Keep',icon:'📚',x:307,y:274,r:86,img:'/assets/houses/story_keep.png'},
+ maths:{name:'Math Manor',icon:'➗',x:421,y:444,r:82,img:'/assets/houses/math_manor.png'},
+ design:{name:'Maker Works',icon:'🛠️',x:158,y:516,r:84,img:'/assets/houses/maker_works.png'},
+ science:{name:'Science Lab',icon:'🔬',x:427,y:636,r:82,img:'/assets/houses/science_lab.png'},
+ art:{name:'Creator Studio',icon:'🎨',x:907,y:362,r:86,img:'/assets/houses/creator_studio.png'},
+ music:{name:'Sound Stage',icon:'🎵',x:757,y:539,r:82,img:'/assets/houses/sound_stage.png'},
+ history:{name:'Time Temple',icon:'🏺',x:928,y:701,r:86,img:'/assets/houses/time_temple.png'},
+ french:{name:'French Café',icon:'🇫🇷',x:185,y:850,r:82,img:'/assets/houses/french_cafe.png'},
+ geography:{name:'Explorer Lodge',icon:'🌍',x:422,y:915,r:82,img:'/assets/houses/explorer_lodge.png'},
+ computing:{name:'Code Core',icon:'💻',x:677,y:916,r:82,img:'/assets/houses/code_core.png'},
+ pe:{name:'Power Arena',icon:'🏃',x:949,y:925,r:84,img:'/assets/houses/power_arena.png'},
+ life:{name:'Think Tower',icon:'💡',x:563,y:742,r:72,img:'/assets/houses/think_tower.png'}
 };
-const BASE={x:559,y:1115,r:88};
+const LANDMARKS=[
+ {id:'academy',name:'Genius Academy',x:576,y:236,w:220,h:220,img:'/assets/houses/genius_academy.png'},
+ {id:'bank',name:'Genius Bank',x:800,y:1110,w:170,h:170,img:'/assets/houses/genius_bank.png'},
+ {id:'mission',name:'Mission Control',x:380,y:1120,w:180,h:180,img:'/assets/houses/mission_control.png'},
+ {id:'museum',name:'Discovery Museum',x:1020,y:515,w:175,h:175,img:'/assets/houses/discovery_museum.png'},
+ {id:'hall',name:'Hall of Achievement',x:750,y:760,w:175,h:175,img:'/assets/houses/hall_of_achievement.png'},
+ {id:'colosseum',name:'Challenge Colosseum',x:985,y:1165,w:210,h:190,img:'/assets/houses/challenge_colosseum.png'},
+ {id:'garden',name:'Community Garden',x:225,y:1150,w:175,h:175,img:'/assets/houses/community_garden.png'},
+ {id:'spacecraft',name:'Genius Spacecraft',x:915,y:180,w:185,h:185,img:'/assets/houses/genius_spacecraft.png'},
+ {id:'baseLab',name:'Base Build Lab',x:575,y:1115,w:190,h:190,img:'/assets/houses/base_build_lab.png'}
+];
+const BASE={x:575,y:1115,r:100};
 const canvas=document.getElementById('worldCanvas'),ctx=canvas?.getContext('2d');if(!canvas||!ctx)return;
 const nearbyCard=document.getElementById('worldNearby'),nearbyName=document.getElementById('nearbyName'),nearbyIcon=document.getElementById('nearbyIcon'),nearbyAction=document.getElementById('nearbyAction'),action=document.getElementById('worldAction'),basePanel=document.getElementById('basePanel'),shop=document.getElementById('buildShop');
 const shell=document.querySelector('.world-shell');
-const image=new Image(); image.decoding='async'; image.src=IMG_SRC+'?v=17';
+const image=new Image(); image.decoding='async'; image.src=IMG_SRC+'?v=18';
+const assetImages=new Map();
+function getAsset(src){if(!src)return null;if(assetImages.has(src))return assetImages.get(src);const im=new Image();im.decoding='async';im.src=src;im.onload=()=>draw();assetImages.set(src,im);return im;}
+[...Object.values(SUBJECTS),...LANDMARKS].forEach(x=>getAsset(x.img));
 let player=world.playerMap||{x:563,y:742};
 let camera={x:player.x,y:player.y,scale:1};
 let target=null,nearby=null,drag=null,last=performance.now(),loaded=false,loadFailed=false,userPanning=false,panRelease=0;
@@ -31,8 +56,9 @@ function fitCamera(){camera.scale=clamp(camera.scale,minScale(),1.8);clampCamera
 addEventListener('resize',resize);resize();
 function worldToScreen(p){const r=canvas.getBoundingClientRect();return{x:(p.x-camera.x)*camera.scale+r.width/2,y:(p.y-camera.y)*camera.scale+r.height/2};}
 function screenToWorld(x,y){const r=canvas.getBoundingClientRect();return{x:camera.x+(x-r.width/2)/camera.scale,y:camera.y+(y-r.height/2)/camera.scale};}
-function draw(){const r=canvas.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle=loadFailed?'#10233d':'#67c85a';ctx.fillRect(0,0,r.width,r.height);if(loaded){const dw=IMG_W*camera.scale,dh=IMG_H*camera.scale,dx=r.width/2-camera.x*camera.scale,dy=r.height/2-camera.y*camera.scale;ctx.drawImage(image,dx,dy,dw,dh);}else if(loadFailed){ctx.fillStyle='#fff';ctx.font='700 18px system-ui';ctx.textAlign='center';ctx.fillText('Map failed to load — tap to retry',r.width/2,r.height/2);}const p=worldToScreen(player);ctx.save();ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowBlur=10;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,19,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.font='26px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🧑‍🚀',p.x,p.y);ctx.restore();}
-function retryImage(){loadFailed=false;image.src=IMG_SRC+'?v=17&t='+Date.now();}
+function drawBuilding(item,w=170,h=170){const im=getAsset(item.img);if(!im||!im.complete||!im.naturalWidth)return;const p=worldToScreen(item),dw=w*camera.scale,dh=h*camera.scale;ctx.save();ctx.shadowColor='rgba(16,45,28,.28)';ctx.shadowBlur=14*camera.scale;ctx.shadowOffsetY=8*camera.scale;ctx.drawImage(im,p.x-dw/2,p.y-dh*.7,dw,dh);ctx.restore();}
+function draw(){const r=canvas.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle=loadFailed?'#10233d':'#67c85a';ctx.fillRect(0,0,r.width,r.height);if(loaded){const dw=IMG_W*camera.scale,dh=IMG_H*camera.scale,dx=r.width/2-camera.x*camera.scale,dy=r.height/2-camera.y*camera.scale;ctx.drawImage(image,dx,dy,dw,dh);}else if(loadFailed){ctx.fillStyle='#fff';ctx.font='700 18px system-ui';ctx.textAlign='center';ctx.fillText('Map failed to load — tap to retry',r.width/2,r.height/2);}LANDMARKS.forEach(l=>drawBuilding(l,l.w,l.h));Object.values(SUBJECTS).forEach(s=>drawBuilding(s,172,172));const p=worldToScreen(player);ctx.save();ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowBlur=10;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,19,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.font='26px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🧑‍🚀',p.x,p.y);ctx.restore();}
+function retryImage(){loadFailed=false;image.src=IMG_SRC+'?v=18&t='+Date.now();}
 image.onload=()=>{loaded=true;loadFailed=false;camera.x=player.x;camera.y=player.y;fitCamera();draw();};
 image.onerror=()=>{loaded=false;loadFailed=true;draw();};
 function nearestSubject(){let best=null,bd=Infinity;for(const [id,s] of Object.entries(SUBJECTS)){const d=Math.hypot(player.x-s.x,player.y-s.y);if(d<bd){bd=d;best={id,...s,d}}}return bd<120?best:null;}
