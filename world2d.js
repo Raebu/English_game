@@ -8,7 +8,12 @@ const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const defaultWorld=()=>({coins:0,earned:0,spent:0,owned:[],playerMap:{x:570,y:810}});
 let world=read(WORLD_KEY,defaultWorld());
 const BUILD_ITEMS=[
-{id:'desk',name:'Genius Desk',icon:'📚',cost:40,desc:'A study desk for your academy base.'},{id:'garden',name:'Knowledge Garden',icon:'🌳',cost:70,desc:'A colourful knowledge garden.'},{id:'robot',name:'Helper Robot',icon:'🤖',cost:110,desc:'A friendly learning companion.'},{id:'lab',name:'Mini Science Lab',icon:'🔬',cost:150,desc:'A glowing experiment wing.'},{id:'tower',name:'Trophy Tower',icon:'🏆',cost:220,desc:'Display your mastery trophies.'},{id:'portal',name:'Challenge Portal',icon:'🌀',cost:300,desc:'Unlock an expert challenge portal.'}
+{id:'desk',name:'Genius Desk',icon:'📚',cost:40,desc:'A study desk for your academy base.'},
+{id:'garden',name:'Knowledge Garden',icon:'🌳',cost:70,desc:'A colourful knowledge garden.'},
+{id:'robot',name:'Helper Robot',icon:'🤖',cost:110,desc:'A friendly learning companion.'},
+{id:'lab',name:'Mini Science Lab',icon:'🔬',cost:150,desc:'A glowing experiment wing.'},
+{id:'tower',name:'Trophy Tower',icon:'🏆',cost:220,desc:'Display your mastery trophies.'},
+{id:'portal',name:'Challenge Portal',icon:'🌀',cost:300,desc:'Unlock an expert challenge portal.'}
 ];
 const SUBJECTS={
  english:{name:'Story Keep',icon:'📚',x:307,y:274,r:86,entry:{x:318,y:438},img:'/assets/houses/story_keep.png'},
@@ -49,28 +54,31 @@ const ROAD_LINES=[
 const canvas=document.getElementById('worldCanvas'),ctx=canvas?.getContext('2d');if(!canvas||!ctx)return;
 const nearbyCard=document.getElementById('worldNearby'),nearbyName=document.getElementById('nearbyName'),nearbyIcon=document.getElementById('nearbyIcon'),nearbyAction=document.getElementById('nearbyAction'),action=document.getElementById('worldAction'),basePanel=document.getElementById('basePanel'),shop=document.getElementById('buildShop');
 const shell=document.querySelector('.world-shell');
-const image=new Image();image.decoding='async';image.src=IMG_SRC+'?v=19';
+const image=new Image();image.decoding='async';image.src=IMG_SRC+'?v=20';
 const assetImages=new Map();
 function getAsset(src){if(!src)return null;if(assetImages.has(src))return assetImages.get(src);const im=new Image();im.decoding='async';im.src=src;im.onload=()=>draw();assetImages.set(src,im);return im;}
 [...Object.values(SUBJECTS),...LANDMARKS].forEach(x=>getAsset(x.img));
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 if(shell)shell.classList.add('reference-map-world');
-const hint=document.getElementById('gestureHint');if(hint){hint.hidden=false;hint.innerHTML='<div class="gesture-hand">☝️</div><strong>Drag or tap the road to walk</strong><small>The map follows your character</small>';setTimeout(()=>hint.classList.add('hide'),4500);}
+const hint=document.getElementById('gestureHint');if(hint){hint.hidden=false;hint.classList.remove('hide');hint.innerHTML='<div class="gesture-hand">☝️</div><strong>Hold and drag to walk</strong><small>Release your finger and your character stops</small>';setTimeout(()=>hint.classList.add('hide'),5000);}
 
-// Build a sampled graph from the road artwork. Every player position and route is snapped to this graph.
+// Sample the visible road network into a navigation graph.
 const graph=[];
 function addNode(p){for(let i=0;i<graph.length;i++)if(Math.hypot(graph[i].x-p.x,graph[i].y-p.y)<8)return i;graph.push({x:p.x,y:p.y,links:[]});return graph.length-1;}
 function connect(a,b){if(a===b)return;const d=Math.hypot(graph[a].x-graph[b].x,graph[a].y-graph[b].y);if(!graph[a].links.some(x=>x.i===b))graph[a].links.push({i:b,d});if(!graph[b].links.some(x=>x.i===a))graph[b].links.push({i:a,d});}
-ROAD_LINES.forEach(line=>{let prev=null;for(let s=0;s<line.length-1;s++){const a=line[s],b=line[s+1],len=Math.hypot(b[0]-a[0],b[1]-a[1]),steps=Math.max(1,Math.ceil(len/22));for(let k=0;k<=steps;k++){if(s>0&&k===0)continue;const t=k/steps,id=addNode({x:a[0]+(b[0]-a[0])*t,y:a[1]+(b[1]-a[1])*t});if(prev!==null)connect(prev,id);prev=id;}}});
+ROAD_LINES.forEach(line=>{let prev=null;for(let s=0;s<line.length-1;s++){const a=line[s],b=line[s+1],len=Math.hypot(b[0]-a[0],b[1]-a[1]),steps=Math.max(1,Math.ceil(len/20));for(let k=0;k<=steps;k++){if(s>0&&k===0)continue;const t=k/steps,id=addNode({x:a[0]+(b[0]-a[0])*t,y:a[1]+(b[1]-a[1])*t});if(prev!==null)connect(prev,id);prev=id;}}});
 function nearestRoadNode(p){let best=0,bd=Infinity;for(let i=0;i<graph.length;i++){const d=(graph[i].x-p.x)**2+(graph[i].y-p.y)**2;if(d<bd){bd=d;best=i;}}return best;}
 function shortestPath(start,end){if(start===end)return[start];const dist=Array(graph.length).fill(Infinity),prev=Array(graph.length).fill(-1),used=Array(graph.length).fill(false);dist[start]=0;for(let n=0;n<graph.length;n++){let u=-1,b=Infinity;for(let i=0;i<graph.length;i++)if(!used[i]&&dist[i]<b){b=dist[i];u=i;}if(u<0||u===end)break;used[u]=true;for(const e of graph[u].links){const nd=dist[u]+e.d;if(nd<dist[e.i]){dist[e.i]=nd;prev[e.i]=u;}}}const out=[];for(let at=end;at!==-1;at=prev[at])out.push(at);return out.reverse();}
+function roadEntry(item){if(item._roadEntry)return item._roadEntry;const h=item.h||172;const approx=item.entry||{x:item.x,y:item.y+h*.31};const n=graph[nearestRoadNode(approx)];item._roadEntry={x:n.x,y:n.y};return item._roadEntry;}
+function buildingDoor(item){const h=item.h||172;return{x:item.x,y:item.y+h*.29};}
+
 let startNode=nearestRoadNode(world.playerMap||defaultWorld().playerMap);
 let player={x:graph[startNode].x,y:graph[startNode].y};
 world.playerMap={...player};write(WORLD_KEY,world);
 let camera={x:player.x,y:player.y,scale:1};
 let route=[],routeIndex=0,nearby=null,last=performance.now(),loaded=false,loadFailed=false,pointer=null,pinch=null,lastRouteAt=0;
-function setRouteTo(p){const now=performance.now();if(now-lastRouteAt<45)return;lastRouteAt=now;const s=nearestRoadNode(player),e=nearestRoadNode(p),ids=shortestPath(s,e);route=ids.slice(1).map(i=>({x:graph[i].x,y:graph[i].y}));routeIndex=0;}
-function routeToEntry(entry){setRouteTo(entry);}
+function clearRoute(save=true){route=[];routeIndex=0;if(save){world.playerMap={x:player.x,y:player.y};write(WORLD_KEY,world);}}
+function setRouteTo(p){if(!pointer)return;const now=performance.now();if(now-lastRouteAt<35)return;lastRouteAt=now;const s=nearestRoadNode(player),e=nearestRoadNode(p),ids=shortestPath(s,e);route=ids.slice(1).map(i=>({x:graph[i].x,y:graph[i].y}));routeIndex=0;}
 function resize(){const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(r.width*d));canvas.height=Math.max(1,Math.round(r.height*d));ctx.setTransform(d,0,0,d,0,0);fitCamera();}
 function minScale(){const r=canvas.getBoundingClientRect();return Math.min(1,Math.max(r.width/IMG_W,r.height/IMG_H,.62));}
 function clampCamera(){const r=canvas.getBoundingClientRect(),mx=Math.min(IMG_W/2,r.width/(2*camera.scale)),my=Math.min(IMG_H/2,r.height/(2*camera.scale));camera.x=clamp(camera.x,mx,IMG_W-mx);camera.y=clamp(camera.y,my,IMG_H-my);}
@@ -78,26 +86,36 @@ function fitCamera(){camera.scale=clamp(camera.scale,minScale(),1.65);clampCamer
 addEventListener('resize',resize);resize();
 function worldToScreen(p){const r=canvas.getBoundingClientRect();return{x:(p.x-camera.x)*camera.scale+r.width/2,y:(p.y-camera.y)*camera.scale+r.height/2};}
 function screenToWorld(x,y){const r=canvas.getBoundingClientRect();return{x:camera.x+(x-r.width/2)/camera.scale,y:camera.y+(y-r.height/2)/camera.scale};}
+function drawDriveway(item){const a=worldToScreen(roadEntry(item)),b=worldToScreen(buildingDoor(item));const width=Math.max(12,30*camera.scale);ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#d6b96f';ctx.lineWidth=width+5;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.strokeStyle='#f2d98f';ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.strokeStyle='rgba(255,248,209,.9)';ctx.lineWidth=Math.max(2,4*camera.scale);ctx.setLineDash([10*camera.scale,10*camera.scale]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.restore();}
 function drawBuilding(item,w=170,h=170){const im=getAsset(item.img);if(!im||!im.complete||!im.naturalWidth)return;const p=worldToScreen(item),dw=w*camera.scale,dh=h*camera.scale;ctx.save();ctx.shadowColor='rgba(16,45,28,.28)';ctx.shadowBlur=14*camera.scale;ctx.shadowOffsetY=8*camera.scale;ctx.drawImage(im,p.x-dw/2,p.y-dh*.7,dw,dh);ctx.restore();}
-function draw(){const r=canvas.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle=loadFailed?'#10233d':'#67c85a';ctx.fillRect(0,0,r.width,r.height);if(loaded){const dw=IMG_W*camera.scale,dh=IMG_H*camera.scale,dx=r.width/2-camera.x*camera.scale,dy=r.height/2-camera.y*camera.scale;ctx.drawImage(image,dx,dy,dw,dh);}else if(loadFailed){ctx.fillStyle='#fff';ctx.font='700 18px system-ui';ctx.textAlign='center';ctx.fillText('Map failed to load — tap to retry',r.width/2,r.height/2);}LANDMARKS.forEach(l=>drawBuilding(l,l.w,l.h));Object.values(SUBJECTS).forEach(s=>drawBuilding(s,172,172));const p=worldToScreen(player),moving=routeIndex<route.length;ctx.save();ctx.shadowColor='rgba(0,0,0,.28)';ctx.shadowBlur=10;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,20,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.font=`${moving?29:28}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.translate(p.x,p.y+(moving?Math.sin(performance.now()/90)*2:0));ctx.fillText('🧒',0,0);ctx.restore();}
-function retryImage(){loadFailed=false;image.src=IMG_SRC+'?v=19&t='+Date.now();}
+function draw(){const r=canvas.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle=loadFailed?'#10233d':'#67c85a';ctx.fillRect(0,0,r.width,r.height);if(loaded){const dw=IMG_W*camera.scale,dh=IMG_H*camera.scale,dx=r.width/2-camera.x*camera.scale,dy=r.height/2-camera.y*camera.scale;ctx.drawImage(image,dx,dy,dw,dh);}else if(loadFailed){ctx.fillStyle='#fff';ctx.font='700 18px system-ui';ctx.textAlign='center';ctx.fillText('Map failed to load — tap to retry',r.width/2,r.height/2);}LANDMARKS.forEach(drawDriveway);Object.values(SUBJECTS).forEach(drawDriveway);LANDMARKS.forEach(l=>drawBuilding(l,l.w,l.h));Object.values(SUBJECTS).forEach(s=>drawBuilding(s,172,172));const p=worldToScreen(player),moving=!!pointer&&routeIndex<route.length;ctx.save();ctx.shadowColor='rgba(0,0,0,.28)';ctx.shadowBlur=10;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,20,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.font=`${moving?29:28}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.translate(p.x,p.y+(moving?Math.sin(performance.now()/90)*2:0));ctx.fillText('🧒',0,0);ctx.restore();}
+function retryImage(){loadFailed=false;image.src=IMG_SRC+'?v=20&t='+Date.now();}
 image.onload=()=>{loaded=true;loadFailed=false;camera.x=player.x;camera.y=player.y;fitCamera();draw();};image.onerror=()=>{loaded=false;loadFailed=true;draw();};
-function nearestSubject(){let best=null,bd=Infinity;for(const [id,s] of Object.entries(SUBJECTS)){const d=Math.hypot(player.x-s.entry.x,player.y-s.entry.y);if(d<bd){bd=d;best={id,...s,d}}}return bd<105?best:null;}
-function updateNearby(){nearby=nearestSubject();if(nearby){nearbyCard.hidden=false;nearbyName.textContent=nearby.name;nearbyIcon.textContent=nearby.icon;nearbyAction.textContent=nearby.d<42?'Ready to enter':'Walk closer';action.hidden=nearby.d>=42;action.textContent=`Enter ${nearby.name}`;}else{nearbyCard.hidden=true;action.hidden=true;}}
+function nearestSubject(){let best=null,bd=Infinity;for(const [id,s] of Object.entries(SUBJECTS)){const entry=roadEntry(s),d=Math.hypot(player.x-entry.x,player.y-entry.y);if(d<bd){bd=d;best={id,...s,entry,d}}}return bd<105?best:null;}
+function updateNearby(){nearby=nearestSubject();if(nearby){nearbyCard.hidden=false;nearbyName.textContent=nearby.name;nearbyIcon.textContent=nearby.icon;nearbyAction.textContent=nearby.d<42?'Ready to enter':'Hold toward the entrance';action.hidden=nearby.d>=42;action.textContent=`Enter ${nearby.name}`;}else{nearbyCard.hidden=true;action.hidden=true;}}
 function startSubject(id){document.querySelector(`[data-subject="${id}"]`)?.click();}
 action?.addEventListener('click',()=>nearby&&startSubject(nearby.id));
-nearbyCard?.addEventListener('click',()=>nearby&&routeToEntry(nearby.entry));
-function moveAlongRoad(dt){if(routeIndex>=route.length)return;const t=route[routeIndex],dx=t.x-player.x,dy=t.y-player.y,d=Math.hypot(dx,dy),step=150*dt;if(d<=step+1){player.x=t.x;player.y=t.y;routeIndex++;}else{player.x+=dx/d*step;player.y+=dy/d*step;}world.playerMap={x:player.x,y:player.y};if(routeIndex>=route.length)write(WORLD_KEY,world);}
+// The nearby card no longer starts autonomous walking; movement only happens while the canvas is actively pressed.
+function moveAlongRoad(dt){if(!pointer||routeIndex>=route.length)return;const t=route[routeIndex],dx=t.x-player.x,dy=t.y-player.y,d=Math.hypot(dx,dy),step=150*dt;if(d<=step+1){player.x=t.x;player.y=t.y;routeIndex++;}else{player.x+=dx/d*step;player.y+=dy/d*step;}world.playerMap={x:player.x,y:player.y};}
 function followCamera(){camera.x+=(player.x-camera.x)*.12;camera.y+=(player.y-camera.y)*.12;clampCamera();}
 function tick(now){const dt=Math.min((now-last)/1000,.05);last=now;moveAlongRoad(dt);followCamera();updateNearby();draw();requestAnimationFrame(tick);}requestAnimationFrame(tick);
 function pointerWorld(e){const r=canvas.getBoundingClientRect();return screenToWorld(e.clientX-r.left,e.clientY-r.top);}
-canvas.addEventListener('pointerdown',e=>{if(loadFailed){retryImage();return;}if(e.pointerType==='touch'&&pinch)return;canvas.setPointerCapture?.(e.pointerId);pointer={id:e.pointerId};setRouteTo(pointerWorld(e));});
-canvas.addEventListener('pointermove',e=>{if(!pointer||pointer.id!==e.pointerId)return;setRouteTo(pointerWorld(e));});
-canvas.addEventListener('pointerup',e=>{if(!pointer||pointer.id!==e.pointerId)return;const p=pointerWorld(e);let hit=null,hd=Infinity;for(const [id,s] of Object.entries(SUBJECTS)){const d=Math.hypot(p.x-s.x,p.y-s.y);if(d<hd){hd=d;hit={id,...s}}}if(hit&&hd<hit.r+35)routeToEntry(hit.entry);else if(Math.hypot(p.x-BASE.x,p.y-BASE.y)<BASE.r+35)routeToEntry(BASE.entry);else setRouteTo(p);pointer=null;});
-canvas.addEventListener('pointercancel',()=>pointer=null);
+function destinationFromPoint(p){let hit=null,hd=Infinity;for(const [id,s] of Object.entries(SUBJECTS)){const d=Math.hypot(p.x-s.x,p.y-s.y);if(d<hd){hd=d;hit={id,...s}}}if(hit&&hd<hit.r+40)return roadEntry(hit);if(Math.hypot(p.x-BASE.x,p.y-BASE.y)<BASE.r+40)return roadEntry(BASE);return p;}
+function beginWalk(e){if(loadFailed){retryImage();return;}if(pinch)return;canvas.setPointerCapture?.(e.pointerId);pointer={id:e.pointerId};setRouteTo(destinationFromPoint(pointerWorld(e)));}
+function updateWalk(e){if(!pointer||pointer.id!==e.pointerId||pinch)return;setRouteTo(destinationFromPoint(pointerWorld(e)));}
+function stopWalk(e){if(pointer&&(!e||pointer.id===e.pointerId)){pointer=null;clearRoute(true);}}
+canvas.addEventListener('pointerdown',beginWalk);
+canvas.addEventListener('pointermove',updateWalk);
+canvas.addEventListener('pointerup',stopWalk);
+canvas.addEventListener('pointercancel',stopWalk);
+canvas.addEventListener('lostpointercapture',stopWalk);
 canvas.addEventListener('wheel',e=>{e.preventDefault();camera.scale=clamp(camera.scale*(e.deltaY>0?.92:1.08),minScale(),1.65);clampCamera();},{passive:false});
-canvas.addEventListener('touchstart',e=>{if(e.touches.length===2){const[a,b]=e.touches;pinch={d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),scale:camera.scale};pointer=null;}},{passive:true});canvas.addEventListener('touchmove',e=>{if(e.touches.length===2&&pinch){const[a,b]=e.touches,d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);camera.scale=clamp(pinch.scale*(d/pinch.d),minScale(),1.65);clampCamera();}},{passive:true});canvas.addEventListener('touchend',e=>{if(e.touches.length<2)pinch=null;},{passive:true});
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===2){stopWalk();const[a,b]=e.touches;pinch={d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),scale:camera.scale};}},{passive:true});
+canvas.addEventListener('touchmove',e=>{if(e.touches.length===2&&pinch){const[a,b]=e.touches,d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);camera.scale=clamp(pinch.scale*(d/pinch.d),minScale(),1.65);clampCamera();}},{passive:true});
+canvas.addEventListener('touchend',e=>{if(e.touches.length<2)pinch=null;},{passive:true});
 function refreshHUD(){world=read(WORLD_KEY,world);const academy=read(ACADEMY_KEY,{}),xp=academy.xp||academy.totalXP||0,level=Math.max(1,Math.floor(xp/180)+1);document.querySelectorAll('#worldCoins,#shopCoins').forEach(el=>el.textContent=world.coins||0);const lv=document.getElementById('worldLevel');if(lv)lv.textContent=level;}setInterval(refreshHUD,800);refreshHUD();
 function renderShop(){if(!shop)return;world=read(WORLD_KEY,world);shop.innerHTML='';BUILD_ITEMS.forEach(item=>{const owned=(world.owned||[]).includes(item.id),b=document.createElement('button');b.className='build-item'+(owned?' owned':'');b.disabled=owned||world.coins<item.cost;b.innerHTML=`<span class="build-icon">${item.icon}</span><strong>${item.name}</strong><small>${item.desc}</small><span class="cost">${owned?'✓ Built':`🪙 ${item.cost}`}</span>`;b.onclick=()=>{world=read(WORLD_KEY,world);if(world.coins<item.cost||world.owned.includes(item.id))return;world.coins-=item.cost;world.spent=(world.spent||0)+item.cost;world.owned.push(item.id);write(WORLD_KEY,world);renderShop();refreshHUD();};shop.appendChild(b);});}
-document.getElementById('openBase')?.addEventListener('click',()=>{basePanel.hidden=false;renderShop();});document.getElementById('closeBase')?.addEventListener('click',()=>basePanel.hidden=true);addEventListener('storage',refreshHUD);addEventListener('ks2coins',refreshHUD);
+document.getElementById('openBase')?.addEventListener('click',()=>{basePanel.hidden=false;renderShop();});
+document.getElementById('closeBase')?.addEventListener('click',()=>basePanel.hidden=true);
+addEventListener('storage',refreshHUD);addEventListener('ks2coins',refreshHUD);
 })();
