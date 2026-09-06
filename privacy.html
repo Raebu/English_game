@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Privacy & learner data | Genius Academy</title>
+  <meta name="description" content="How Genius Academy handles learner names, progress and optional AI tutor data.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="app-shell" style="max-width:900px;margin:0 auto;padding:32px 20px 64px">
+    <a href="/" aria-label="Back to Genius Academy">← Back to Genius Academy</a>
+    <h1>Privacy & learner data</h1>
+    <p><strong>Short version:</strong> Genius Academy is designed to keep ordinary learner progress on the device. The optional AI tutor receives only the information needed to answer the current learning question.</p>
+
+    <h2>Information stored on this device</h2>
+    <p>The web app can store a learner-selected display name, scores, mission progress, skill/mastery information, rewards and parent-configured learning settings in browser storage. This lets progress survive a page refresh without requiring an account.</p>
+
+    <h2>Optional AI tutor</h2>
+    <p>If the AI tutor is enabled, Genius Academy may send the learner's current question, school year and up to five priority-skill labels/mastery percentages to the configured AI provider so it can produce an age-appropriate explanation.</p>
+    <p>The learner's display name is not sent to the AI provider. The tutor is instructed not to ask for or infer a full name, contact details, school or other identifying information. If the provider is not configured or is unavailable, the app reports the tutor as unavailable rather than pretending a canned answer came from AI.</p>
+
+    <h2>Advertising and tracking</h2>
+    <p>The current repository does not include an advertising SDK or a behavioural analytics integration. If that changes, this notice and the privacy review must be updated before release.</p>
+
+    <h2>Android</h2>
+    <p>The Android app disables Android backup for learner state in the application manifest. Release builds still require device testing before publication.</p>
+
+    <h2>Parents and carers</h2>
+    <p>Parents and carers should avoid entering a child's full name, school, address, contact details or other identifying information into the AI tutor. A future production release must complete the applicable child-data, transparency, retention and provider review before external launch.</p>
+
+    <h2>Engineering status</h2>
+    <p>This page describes the current technical behaviour of the repository. It is not a substitute for the final legal/privacy notice or formal compliance approval.</p>
+  </main>
+</body>
+</html>
