@@ -44,7 +44,7 @@ test('fails closed when the AI provider credential is absent', async () => {
   delete process.env.OPENAI_API_KEY;
   try {
     const res = responseHarness();
-    await handler({ method: 'POST', body: { message: 'Help with fractions', childName: 'A', year: 4 } }, res);
+    await handler({ method: 'POST', body: { message: 'Help with fractions', year: 4 } }, res);
     assert.equal(res.statusCode, 503);
     assert.equal(res.body.mode, 'unavailable');
     assert.match(res.body.reply, /Year 4/);
@@ -72,7 +72,6 @@ test('sanitises child context and returns provider output without leaking failur
       method: 'POST',
       body: {
         message: '  Explain fractions  ',
-        childName: 'A'.repeat(100),
         year: 99,
         weakSkills: Array.from({ length: 10 }, (_, i) => ({ skill: 'skill-' + i, mastery: 150 })),
       },
@@ -82,7 +81,7 @@ test('sanitises child context and returns provider output without leaking failur
     assert.equal(res.body.reply, 'Try splitting the number into equal parts.');
     assert.equal(providerBody.input[1].content, 'Explain fractions');
     assert.match(providerBody.input[0].content, /Year 4/);
-    assert.ok(providerBody.input[0].content.includes('A'.repeat(80)));
+    assert.doesNotMatch(providerBody.input[0].content, /child is called/i);
     assert.equal((providerBody.input[0].content.match(/skill-/g) || []).length, 5);
     assert.match(providerBody.input[0].content, /100% mastery/);
   } finally {
