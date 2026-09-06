@@ -44,6 +44,13 @@ const manifest = await readFile(join(root, 'android/app/src/main/AndroidManifest
 if (!manifest.includes('android:allowBackup="false"')) problems.push('AndroidManifest.xml: learner-state backup is not disabled');
 if (!manifest.includes('android:usesCleartextTraffic="false"')) problems.push('AndroidManifest.xml: cleartext traffic is not disabled');
 
+const androidActivity = await readFile(join(root, 'android/app/src/main/java/com/raeburn/geniusacademy/MainActivity.kt'), 'utf8');
+if (!androidActivity.includes('allowFileAccess = false')) problems.push('MainActivity.kt: WebView file access must be disabled');
+if (!androidActivity.includes('allowContentAccess = false')) problems.push('MainActivity.kt: WebView content access must be disabled');
+if (!androidActivity.includes('MIXED_CONTENT_NEVER_ALLOW')) problems.push('MainActivity.kt: mixed content must be disabled');
+if (!androidActivity.includes('setAcceptThirdPartyCookies(webView, false)')) problems.push('MainActivity.kt: third-party WebView cookies must be disabled');
+if (!androidActivity.includes('target.host.equals(appUri.host')) problems.push('MainActivity.kt: navigation must be restricted to the configured app host');
+
 const tutor = await readFile(join(root, 'api/tutor.js'), 'utf8');
 if (!tutor.includes("res.status(503)") || !tutor.includes("res.status(502)")) {
   problems.push('api/tutor.js: AI provider/configuration failures are not visibly fail-closed');
