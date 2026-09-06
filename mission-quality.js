@@ -91,8 +91,7 @@
         return q;
       }
     }
-    // Fallback only if the source pool cannot produce another unique question.
-    return q;
+    throw new Error(`Unable to generate a unique ${subject} question after 80 attempts`);
   };
 
   window.__resetMissionQuestionHistory = function(subject) {
