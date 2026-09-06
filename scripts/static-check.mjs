@@ -49,6 +49,15 @@ if (!tutor.includes("res.status(503)") || !tutor.includes("res.status(502)")) {
   problems.push('api/tutor.js: AI provider/configuration failures are not visibly fail-closed');
 }
 if (!tutor.includes("Cache-Control', 'no-store")) problems.push('api/tutor.js: no-store response policy missing');
+if (/childName|child is called/i.test(tutor)) problems.push('api/tutor.js: learner display name must not be sent to the AI provider');
+
+const academy = await readFile(join(root, 'academy.js'), 'utf8');
+if (/childName:app\.state\.childName/.test(academy)) problems.push('academy.js: learner display name is still sent to the tutor API');
+if (!academy.includes("data.mode==='unavailable'")) problems.push('academy.js: tutor outages are not explicitly rendered as unavailable');
+
+const index = await readFile(join(root, 'index.html'), 'utf8');
+if (!index.includes('/privacy.html')) problems.push('index.html: learner-facing privacy link missing');
+await stat(join(root, 'privacy.html')).catch(() => problems.push('privacy.html: learner-facing notice missing'));
 
 if (problems.length) {
   console.error(problems.join('\n'));
