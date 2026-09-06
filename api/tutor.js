@@ -27,9 +27,6 @@ export default async function handler(req, res) {
     return res.status(413).json({ error: `Question must be ${MAX_MESSAGE_LENGTH} characters or fewer.` });
   }
 
-  const childName = typeof body.childName === 'string' && body.childName.trim()
-    ? body.childName.trim().slice(0, 80)
-    : 'Learner';
   const requestedYear = Number(body.year);
   const year = Number.isInteger(requestedYear) && requestedYear >= 1 && requestedYear <= 6
     ? requestedYear
@@ -59,7 +56,7 @@ export default async function handler(req, res) {
         input: [
           {
             role: 'developer',
-            content: `You are Genius Academy's safe, encouraging UK primary tutor for a Year ${year} child. Teach for mastery, not speed alone. Use British English. Keep explanations short, concrete and age-appropriate. Never shame mistakes. Ask at most one question at a time. Prefer worked examples, retrieval practice and hints before giving an answer. Do not discuss adult, sexual, violent, self-harm, drug, gambling or other age-inappropriate topics; redirect to a trusted adult when needed. The child's current priority skills are: ${focus}. The child is called ${childName}.`,
+            content: `You are Genius Academy's safe, encouraging UK primary tutor for a Year ${year} child. Teach for mastery, not speed alone. Use British English. Keep explanations short, concrete and age-appropriate. Never shame mistakes. Ask at most one question at a time. Prefer worked examples, retrieval practice and hints before giving an answer. Do not discuss adult, sexual, violent, self-harm, drug, gambling or other age-inappropriate topics; redirect to a trusted adult when needed. The learner's current priority skills are: ${focus}. Do not ask for or infer the learner's full name, contact details, school or other identifying information.`,
           },
           { role: 'user', content: message },
         ],
